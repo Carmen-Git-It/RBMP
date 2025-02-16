@@ -12,7 +12,9 @@
   },
   "dependencies": {
     "electron-serve": "^1.3.0",
-    "electron-store": "^8.2.0"
+    "electron-store": "^8.2.0",
+    "react-player": "^2.16.0",
+    "screenfull": "^6.0.2"
   },
   "devDependencies": {
     "@emotion/cache": "^11.11.0",

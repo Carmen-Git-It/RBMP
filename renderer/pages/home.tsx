@@ -8,56 +8,52 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogActions from '@mui/material/DialogActions'
 import Typography from '@mui/material/Typography'
+import  { Box, Tabs, Tab, Paper } from '@mui/material'
 import Link from '../components/Link'
 import { styled } from '@mui/material'
+import Player from './player/index'
+import { useState, useEffect } from 'react'
+import Config from './config'
 
 const Root = styled('div')(({ theme }) => {
   return {
     textAlign: 'center',
-    paddingTop: theme.spacing(4),
   }
 })
 
 export default function HomePage() {
-  const [open, setOpen] = React.useState(false)
-  const handleClose = () => setOpen(false)
-  const handleClick = () => setOpen(true)
+  const [currentTab, setCurrentTab] = React.useState(0);
+
+  const handleTabChange = (event: React.SyntheticEvent, newTab: number) => {
+    setCurrentTab(newTab);
+  };
+
+  const [hasWindow, setHasWindow] = useState(false);
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setHasWindow(true);
+    }
+  }, []);
 
   return (
     <React.Fragment>
       <Head>
-        <title>Home - Nextron (with-material-ui)</title>
+        <title>RBMS</title>
       </Head>
       <Root>
-        <Dialog open={open} onClose={handleClose}>
-          <DialogTitle>Super Secret Password</DialogTitle>
-          <DialogContent>
-            <DialogContentText>1-2-3-4-5</DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button color="primary" onClick={handleClose}>
-              OK
-            </Button>
-          </DialogActions>
-        </Dialog>
-        <Typography variant="h4" gutterBottom>
-          Material-UI
-        </Typography>
-        <Typography variant="subtitle1" gutterBottom>
-          with Nextron
-        </Typography>
-        <Image
-          src="/images/logo.png"
-          alt="Logo image"
-          width={256}
-          height={256}
-        />
-        <Typography gutterBottom>
-          <Link href="/next">Go to the next page</Link>
-        </Typography>
-        <Button variant="contained" color="secondary" onClick={handleClick}>
-          Super Secret Password
-        </Button>
+        <Paper elevation={6}>
+          <Box sx={{borderBottom: 1, borderColor: 'divider', marginBottom: 3}}>
+            <Tabs value={currentTab} onChange={handleTabChange} centered >
+              <Tab label="Player" />
+              <Tab label="Config" />
+            </Tabs>
+          </Box>
+        </Paper>
+        
+        <Paper elevation={1} sx={{marginLeft: 2, marginRight: 2}}>
+          {currentTab == 0 && hasWindow && <Player/>}
+          {currentTab == 1 && <Config/>}
+        </Paper>
       </Root>
     </React.Fragment>
   )
