@@ -16,14 +16,13 @@ import { useState, useEffect } from 'react'
 import Config from './config'
 import { useSetAtom } from 'jotai'
 
-import {playlistPlayerAtom} from '../store/store';
+import {filesAtom, playlistPlayerAtom} from '../store/store';
 import { playlistConfigAtom } from '../store/store'
 import VideoFile from '../lib/model/videoFile';
 import PlaylistFile from '../lib/model/playlistFile';
 import PlaylistSlot from '../lib/model/playlistSlot'
 import VideoType from '../lib/model/videoType'
 import PlaylistConfig from '../lib/model/playlistConfig'
-
 
 const Root = styled('div')(({ theme }) => {
   return {
@@ -42,7 +41,7 @@ export default function HomePage() {
     file.filePath = "C:/mens_fashion.mp4";
     var playlistFile : PlaylistFile = new PlaylistFile();
     playlistFile.file = file;
-    playlistFile.timeStart = 1402;
+    playlistFile.timeStart = 0;
     playlistFile.timeEnd = 1410;
     playlistFile.volume = 100;
 
@@ -136,6 +135,15 @@ export default function HomePage() {
     var configs = new Array<PlaylistConfig>()
     configs.push(config);
     setConfigs(configs);
+  }
+
+  // TODO: Remove after testing
+  const setFiles = useSetAtom(filesAtom);
+  {
+    var files : Array<VideoFile> = new Array<VideoFile>();
+    files.push(file);
+    files.push(file1);
+    setFiles(files);
   }
 
   const handleTabChange = (event: React.SyntheticEvent, newTab: number) => {

@@ -8,4 +8,4 @@ export const playlistPlayerAtom = atom(new Array<PlaylistFile>());      // Array
 export const playlistConfigAtom = atom(new Array<PlaylistConfig>());    // Array of all playlist configurations
 export const filesAtom = atom(new Array<VideoFile>());                  // Array of all files registered
 export const typesAtom = atom(new Array<VideoType>());                  // Array of all file types (user-defined)
-export const currentPlaylistConfigIdAtom = atom(0);                       // id of of the currently selected playlist config
+export const currentPlaylistConfigIdAtom = atom(0);                     // id of of the currently selected playlist config
