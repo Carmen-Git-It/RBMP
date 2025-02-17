@@ -16,5 +16,8 @@ const handler = {
 }
 
 contextBridge.exposeInMainWorld('ipc', handler)
+contextBridge.exposeInMainWorld('electronAPI', {
+  openFile: () => ipcRenderer.invoke('dialog:openFile')
+});
 
 export type IpcHandler = typeof handler
