@@ -152,7 +152,19 @@ export default function HomePage() {
     // TODO: Remove after Testing
     {
       var types : Array<VideoType> = new Array<VideoType>();
+
+      var tempType3 : VideoType = new VideoType();
+      tempType3.id = -1;
+      tempType3.name = "Create New Type";
+      types.push(tempType3);
+
       types.push(tempType);
+      
+      var tempType2 : VideoType = new VideoType();
+      tempType2.id = 1;
+      tempType2.name = "Movies";
+      types.push(tempType2);
+
       setTypes(types);
     }
   }
