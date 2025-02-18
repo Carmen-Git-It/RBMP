@@ -27,12 +27,14 @@ export default function Config() {
         setTypeModalOpen(true);
     }
 
+    // Save new type and set slot type to new type
     function handleCloseTypeModal() {
-        // TODO: set type name, create new time, set type for slot
         var tempType : VideoType = new VideoType();
         tempType.name = newTypeName;
         tempType.id = types[types.length - 1].id + 1;
-        types.push(tempType);
+        var tempTypes : Array<VideoType> = types.slice();
+        tempTypes.push(tempType);
+        setTypes(tempTypes);
         configs[currentConfig].slots[newTypeSlot].type = types[types.length - 1];
         slotTypes[newTypeSlot] = tempType;
 
@@ -151,8 +153,6 @@ export default function Config() {
     function handleChangeDescription(e) {
         setDescription(e.target.value);
     }
-    
-    // TODO: Do the same as above but for slot type
 
     useEffect(() => {
 
