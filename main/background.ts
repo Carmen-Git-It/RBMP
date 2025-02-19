@@ -1,8 +1,8 @@
 import path from 'path'
-import { app, ipcMain, dialog, net, protocol } from 'electron'
+import { app, ipcMain } from 'electron'
 import serve from 'electron-serve'
 import { createWindow } from './helpers'
-import fs from 'fs'
+import fs from 'fs';
 
 const isProd = process.env.NODE_ENV === 'production'
 
@@ -12,77 +12,81 @@ if (isProd) {
   app.setPath('userData', `${app.getPath('userData')} (development)`)
 }
 
-// protocol.registerSchemesAsPrivileged([
-//   {
-//     scheme: 'media-loader',
-//     privileges: {
-//       secure: true,
-//       bypassCSP: true,
-//       stream: true,
-//     }
-//   }
-// ])
+// File Writing
+const appPath = () => {
+  switch(process.platform) {
+    case 'darwin': {
+      return path.join(process.env.HOME, 'Library', 'Application Support');
+    }
+    case 'win32': {
+      return process.env.APPDATA;
+    }
+    case 'linux': {
+      return process.env.HOME;
+    }
+  }
+}
 
-async function handleFileOpen () {
-  const { canceled, filePaths } = await dialog.showOpenDialog({})
-  if (!canceled) {
-    return filePaths[0]
+const writeToFile = (fileName, data) => {
+  const fullPath = path.join(appPath(), "\\", fileName);
+  fs.writeFile(fullPath, data, ((err) => {
+    console.log(err);
+    if (err) throw err;
+  }));
+
+  console.log("Wrote file " + path.join(appPath(), "\\", fileName));
+}
+
+const loadFile = (fileName) => {
+  try {
+    const fullPath = path.join(appPath(), "\\", fileName);
+    const data = fs.readFileSync(fullPath, 'utf-8');
+    console.log("Loaded file " + fileName);
+    return data;
+  } catch(e) {
+    console.log(e);
+    return null;
   }
 }
 
 ;(async () => {
-  await app.whenReady()
+  await app.whenReady();
 
-  ipcMain.handle('dialog:openFile', handleFileOpen);
-
-  // protocol.registerFileProtocol("media-loader", (request, callback) => {
-  //   const url = request.url.replace("media-loader://", "");
-  //   try {
-  //     return callback(url);
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // });
-
-  // protocol.handle('media-loader', (request) => {
-  //   let thing =  net.fetch('file://' + request.url.slice('media-loader://'.length))
-  //   thing
-  //   .then((t) => {
-  //     console.log(t)
-  //     console.log("SUCCESS BITCH")
-  //   })
-  //   .catch((t) => {
-  //     console.log(t)
-  //   })
-  //   return thing;
-  // });
-  // console.log("FUCK YOU")
+  ipcMain.handle('loadFile', async (event, args) => {
+    const data = loadFile(args.fileName);
+    return data;
+  });
 
   const win = createWindow('main', {
     width: 1280,
     height: 760,
     webPreferences: {
+      nodeIntegration: true,
       webSecurity: false,
       preload: path.join(__dirname, 'preload.js'),
     },
-  })
+  });
 
   if (isProd) {
-    await win.loadURL('app://./home')
+    await win.loadURL('app://./home');
   } else {
-    const port = process.argv[2]
-    await win.loadURL(`http://localhost:${port}/home`)
-    win.webContents.openDevTools()
+    const port = process.argv[2];
+    await win.loadURL(`http://localhost:${port}/home`);
+    win.webContents.openDevTools();
   }
 })()
 
 app.on('window-all-closed', () => {
   app.quit()
-})
+});
 
 ipcMain.on('message', async (event, arg) => {
   event.reply('message', `${arg} World!`)
-})
+});
+
+ipcMain.on('write_file', async(event, arg) => {
+  writeToFile(arg.fileName, arg.data);
+});
 
 // ipcMain.on("askToRead", (event, filePath) => {
   

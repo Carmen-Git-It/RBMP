@@ -1,15 +1,6 @@
 import React from 'react'
 import Head from 'next/head'
-import Image from 'next/image'
-import Button from '@mui/material/Button'
-import Dialog from '@mui/material/Dialog'
-import DialogTitle from '@mui/material/DialogTitle'
-import DialogContent from '@mui/material/DialogContent'
-import DialogContentText from '@mui/material/DialogContentText'
-import DialogActions from '@mui/material/DialogActions'
-import Typography from '@mui/material/Typography'
 import  { Box, Tabs, Tab, Paper } from '@mui/material'
-import Link from '../components/Link'
 import { styled } from '@mui/material'
 import Player from './player/index'
 import { useState, useEffect } from 'react'
@@ -23,6 +14,8 @@ import PlaylistFile from '../lib/model/playlistFile';
 import PlaylistSlot from '../lib/model/playlistSlot'
 import VideoType from '../lib/model/videoType'
 import PlaylistConfig from '../lib/model/playlistConfig'
+import loadConfigs from '../lib/loadConfigs'
+import saveConfigs from '../lib/saveConfigs'
 
 const Root = styled('div')(({ theme }) => {
   return {
@@ -159,7 +152,7 @@ export default function HomePage() {
       types.push(tempType3);
 
       types.push(tempType);
-      
+
       var tempType2 : VideoType = new VideoType();
       tempType2.id = 1;
       tempType2.name = "Movies";
@@ -167,6 +160,8 @@ export default function HomePage() {
 
       setTypes(types);
     }
+
+    return configs;
   }
   
 
@@ -177,7 +172,17 @@ export default function HomePage() {
   const [hasWindow, setHasWindow] = useState(false);
   useEffect(() => {
     console.log("HOME REFRESH");
-    setup();
+
+    // Load configs
+    loadConfigs().then((conf) => {
+      if (conf == null) {
+        const configs = setup();
+        saveConfigs(configs);
+      } else {
+        setConfigs(conf);
+      }
+    });    
+
     if (typeof window !== "undefined") {
       setHasWindow(true);
     }

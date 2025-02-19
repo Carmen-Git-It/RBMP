@@ -15,8 +15,8 @@ export default class PlaylistSlot implements Serializable<PlaylistSlot>{
         this.startTime = input.startTime;
         this.endTime = input.endTime;
         this.type = new VideoType().deserialize(input.type);
-        this.volume = input.volume();
-        this.muted = input.muted();
+        this.volume = input.volume;
+        this.muted = input.muted;
 
         return this;
     }

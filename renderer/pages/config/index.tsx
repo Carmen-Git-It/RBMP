@@ -6,6 +6,8 @@ import VideoType from "../../lib/model/videoType";
 
 export default function Config() {
     const [configs, setConfigs] = useAtom(playlistConfigAtom);
+
+    console.log("CONFIG RENDERER + " + configs);
     const [currentConfig, setCurrentConfig] = useAtom(currentPlaylistConfigIdAtom);
     const [files, setFiles] = useAtom(filesAtom);
     const [types, setTypes] = useAtom(typesAtom);
@@ -166,7 +168,7 @@ export default function Config() {
 
     return (
         <React.Fragment>
-            <Typography variant="h1" gutterBottom>Config</Typography>
+            <Typography variant="h3" gutterBottom sx={{paddingTop:2}}>Config</Typography>
             <Modal
                 open={typeModalOpen}
                 onClose={handleCloseTypeModal}
@@ -182,7 +184,7 @@ export default function Config() {
                     boxShadow: 24, 
                     p: 4,}}>
                     <Typography id="type-modal-title" variant="h6" component="h2">Create New Type</Typography>
-                    <TextField id="new-type-name" label="Name" variant="outlined" onChange={handleChangeTypeName}/>
+                    <TextField id="new-type-name" label="Name" variant="outlined" onChange={handleChangeTypeName} error={newTypeName === ""}/>
 
                 </Box>
             </Modal>
@@ -205,7 +207,14 @@ export default function Config() {
                             <Box sx={{borderBottom: 1, borderColor: 'divider', marginBottom: 3, maxHeight: 400, paddingTop: 1, paddingRight: 2, overflow: 'auto'}}>
                                 <Stack
                                     spacing={2}>
-                                    <TextField id="config-name" label="Name" variant="outlined" defaultValue={configs[currentConfig].name} onChange={handleChangeName}/>
+                                    <TextField 
+                                        id="config-name" 
+                                        label="Name"
+                                        variant="outlined" 
+                                        defaultValue={configs[currentConfig].name} 
+                                        onChange={handleChangeName}
+                                        error={name === ""}
+                                        helperText={name === "" ? "Name must not be empty" : ""}/>
                                     <TextField id="config-description" label="Description" variant="outlined" defaultValue={configs[currentConfig].description} multiline onChange={handleChangeDescription}/>
                                     <Paper elevation={6}>
                                         {configs[currentConfig].slots.map((value, key) => 
