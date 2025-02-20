@@ -27,7 +27,7 @@ const appPath = () => {
   }
 }
 
-const writeToFile = (fileName, data) => {
+const writeToFile = async (fileName, data) => {
   const fullPath = path.join(appPath(), "\\", fileName);
   fs.writeFile(fullPath, data, ((err) => {
     console.log(err);

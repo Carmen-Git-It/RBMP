@@ -15,7 +15,9 @@ import PlaylistSlot from '../lib/model/playlistSlot'
 import VideoType from '../lib/model/videoType'
 import PlaylistConfig from '../lib/model/playlistConfig'
 import loadConfigs from '../lib/loadConfigs'
-import saveConfigs from '../lib/saveConfigs'
+import writeData from '../lib/writeData'
+import loadTypes from '../lib/loadTypes'
+import loadFiles from '../lib/loadFiles'
 
 const Root = styled('div')(({ theme }) => {
   return {
@@ -32,11 +34,39 @@ export default function HomePage() {
 
   function setup() {
     console.log("Setting Atoms!!");
+    
+    var tempType : VideoType = new VideoType();
+    tempType.id = 0;
+    tempType.name = "TV";
+
+    // TODO: Remove after Testing
+    {
+      var types : Array<VideoType> = new Array<VideoType>();
+
+      var tempType3 : VideoType = new VideoType();
+      tempType3.id = -1;
+      tempType3.name = "Create New Type";
+      types.push(tempType3);
+
+      types.push(tempType);
+
+      var tempType2 : VideoType = new VideoType();
+      tempType2.id = 1;
+      tempType2.name = "Movies";
+      types.push(tempType2);
+
+      setTypes(types);
+    }
+
     // TODO: REMOVE AFTER TESTING
     {
       var file : VideoFile = new VideoFile();
       file.fileName = "Men's Fashion";
       file.filePath = "C:/mens_fashion.mp4";
+      file.duration = 360;
+      file.type = tempType;
+      file.muted = false;
+      file.id = 0;
       var playlistFile : PlaylistFile = new PlaylistFile();
       playlistFile.file = file;
       playlistFile.timeStart = 0;
@@ -46,6 +76,10 @@ export default function HomePage() {
       var file1 : VideoFile = new VideoFile();
       file1.fileName = "Doctor Who Season 3 Episode 1";
       file1.filePath = "C:/Users/fang2/OneDrive/Documents/coding/RBMP/sample_video/doctor_who_3_1.mp4";
+      file1.duration = 360;
+      file1.type = tempType2;
+      file1.muted = false;
+      file1.id = 1;
       var playlistFile1 : PlaylistFile = new PlaylistFile();
       playlistFile1.file = file1;
       playlistFile1.timeStart = 1411;
@@ -59,9 +93,7 @@ export default function HomePage() {
     }
   
     // TODO REMOVE AFTER TESTING
-    var tempType : VideoType = new VideoType();
-    tempType.id = 0;
-    tempType.name = "TV";
+
     {
       var config : PlaylistConfig = new PlaylistConfig();
       var slots : Array<PlaylistSlot> = new Array<PlaylistSlot>();
@@ -128,7 +160,7 @@ export default function HomePage() {
       config.start_time = 0;
       config.end_time = 1439;
       config.description = "A default configuration for testing purposes.";
-  
+      
       var configs = new Array<PlaylistConfig>()
       configs.push(config);
       setConfigs(configs);
@@ -141,27 +173,8 @@ export default function HomePage() {
       files.push(file1);
       setFiles(files);
     }
-  
-    // TODO: Remove after Testing
-    {
-      var types : Array<VideoType> = new Array<VideoType>();
 
-      var tempType3 : VideoType = new VideoType();
-      tempType3.id = -1;
-      tempType3.name = "Create New Type";
-      types.push(tempType3);
-
-      types.push(tempType);
-
-      var tempType2 : VideoType = new VideoType();
-      tempType2.id = 1;
-      tempType2.name = "Movies";
-      types.push(tempType2);
-
-      setTypes(types);
-    }
-
-    return configs;
+    return {configs: configs, types: types, files: files};
   }
   
 
@@ -175,13 +188,47 @@ export default function HomePage() {
 
     // Load configs
     loadConfigs().then((conf) => {
-      if (conf == null) {
-        const configs = setup();
-        saveConfigs(configs);
+      if (conf.length === 0) {
+        const configs = setup().configs;
+        writeData("configs.conf", configs);
       } else {
         setConfigs(conf);
       }
-    });    
+
+    }).catch((e) => {
+      console.log(e);
+      const configs = setup().configs;
+      writeData("configs.conf", configs);
+    });
+
+    // Load types
+    loadTypes().then((t) => {
+      if (t.length === 0) {
+        const types = setup().types;
+        writeData("types.conf", types);
+      } else {
+        setTypes(t);
+      }
+    }).catch((e) => {
+      console.log(e);
+      const types = setup().types;
+      writeData("types.conf", types);
+    }); 
+
+
+    // Load files
+    loadFiles().then((f) => {
+      if (f.length === 0) {
+        const files = setup().files;
+        writeData("files.conf", files);
+      } else {
+        setFiles(f);
+      }
+    }).catch((e) => {
+      console.log(e);
+      const files = setup().files;
+      writeData("files.conf", files);
+    });  
 
     if (typeof window !== "undefined") {
       setHasWindow(true);
