@@ -1,14 +1,19 @@
 import Serializable from "../serializable";
 import VideoType from "./videoType";
+import {v4 as uuidv4} from 'uuid';
 
 export default class VideoFile implements Serializable<VideoFile>{
-    id: number;
+    id: String;
 
     fileName: String;
     filePath: String;   // Absolute path
     duration: number;   // In ms
     type: VideoType;
     muted: boolean;     // If true, always run muted
+
+    constructor() {
+        this.id = uuidv4();
+    }
 
     deserialize(input){
         this.id = input.id;

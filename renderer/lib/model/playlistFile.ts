@@ -1,14 +1,19 @@
 import Serializable from "../serializable";
 import VideoFile from "./videoFile";
+import {v4 as uuidv4} from 'uuid';
 
 export default class PlaylistFile implements Serializable<PlaylistFile>{
-    id: number;
+    id: String;
 
     file: VideoFile;
     timeStart: number;  // In minutes from 00:00
     timeEnd: number;    // In minutes from 00:00
     muted: boolean;
     volume: number;     // From 0-100
+
+    constructor() {
+        this.id = uuidv4();
+    }
 
     deserialize(input){
         this.id = input.id;

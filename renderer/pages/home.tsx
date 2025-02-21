@@ -36,7 +36,6 @@ export default function HomePage() {
     console.log("Setting Atoms!!");
     
     var tempType : VideoType = new VideoType();
-    tempType.id = 0;
     tempType.name = "TV";
 
     // TODO: Remove after Testing
@@ -44,14 +43,12 @@ export default function HomePage() {
       var types : Array<VideoType> = new Array<VideoType>();
 
       var tempType3 : VideoType = new VideoType();
-      tempType3.id = -1;
       tempType3.name = "Create New Type";
       types.push(tempType3);
 
       types.push(tempType);
 
       var tempType2 : VideoType = new VideoType();
-      tempType2.id = 1;
       tempType2.name = "Movies";
       types.push(tempType2);
 
@@ -66,7 +63,6 @@ export default function HomePage() {
       file.duration = 360;
       file.type = tempType;
       file.muted = false;
-      file.id = 0;
       var playlistFile : PlaylistFile = new PlaylistFile();
       playlistFile.file = file;
       playlistFile.timeStart = 0;
@@ -79,7 +75,6 @@ export default function HomePage() {
       file1.duration = 360;
       file1.type = tempType2;
       file1.muted = false;
-      file1.id = 1;
       var playlistFile1 : PlaylistFile = new PlaylistFile();
       playlistFile1.file = file1;
       playlistFile1.timeStart = 1411;
@@ -156,7 +151,6 @@ export default function HomePage() {
   
       config.slots = slots;
       config.name = "Default";
-      config.id = 0;
       config.start_time = 0;
       config.end_time = 1439;
       config.description = "A default configuration for testing purposes.";
@@ -194,7 +188,6 @@ export default function HomePage() {
       } else {
         setConfigs(conf);
       }
-
     }).catch((e) => {
       console.log(e);
       const configs = setup().configs;

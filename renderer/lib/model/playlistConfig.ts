@@ -1,14 +1,19 @@
 import Serializable from "../serializable";
 import PlaylistSlot from "./playlistSlot";
+import {v4 as uuidv4} from 'uuid';
 
 export default class PlaylistConfig implements Serializable<PlaylistConfig>{
-    id: number;
+    id: String;
 
     name: String;
     description: String;
     start_time: number;
     end_time: number;
     slots: Array<PlaylistSlot>
+
+    constructor() {
+        this.id = uuidv4();
+    }
 
     deserialize(input){
         this.id = input.id;

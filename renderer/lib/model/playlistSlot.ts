@@ -1,14 +1,19 @@
 import Serializable from "../serializable";
 import VideoType from "./videoType";
+import {v4 as uuidv4} from 'uuid';
 
 export default class PlaylistSlot implements Serializable<PlaylistSlot>{
-    id: number;
+    id: String;
 
     startTime: number;
     endTime: number;
     type: VideoType;
     volume: number;
     muted: boolean;
+
+    constructor() {
+        this.id = uuidv4();
+    }
 
     deserialize(input){
         this.id = input.id;
