@@ -11,7 +11,7 @@ export default class PlaylistConfig implements Serializable<PlaylistConfig>{
     end_time: number;
     slots: Array<PlaylistSlot>
 
-    constructor() {
+    generateUUID() {
         this.id = uuidv4();
     }
 

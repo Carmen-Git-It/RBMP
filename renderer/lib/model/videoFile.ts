@@ -11,7 +11,7 @@ export default class VideoFile implements Serializable<VideoFile>{
     type: VideoType;
     muted: boolean;     // If true, always run muted
 
-    constructor() {
+    generateUUID() {
         this.id = uuidv4();
     }
 

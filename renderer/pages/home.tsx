@@ -27,6 +27,8 @@ const Root = styled('div')(({ theme }) => {
 
 export default function HomePage() {
   const [currentTab, setCurrentTab] = React.useState(0);
+  const [runOnce, setRunOnce] = React.useState(false);
+
   const setPlaylist = useSetAtom(playlistPlayerAtom);
   const setConfigs = useSetAtom(playlistConfigAtom);
   const setFiles = useSetAtom(filesAtom);
@@ -36,6 +38,7 @@ export default function HomePage() {
     console.log("Setting Atoms!!");
     
     var tempType : VideoType = new VideoType();
+    tempType.generateUUID();
     tempType.name = "TV";
 
     // TODO: Remove after Testing
@@ -43,12 +46,14 @@ export default function HomePage() {
       var types : Array<VideoType> = new Array<VideoType>();
 
       var tempType3 : VideoType = new VideoType();
+      tempType3.generateUUID();
       tempType3.name = "Create New Type";
       types.push(tempType3);
 
       types.push(tempType);
 
       var tempType2 : VideoType = new VideoType();
+      tempType2.generateUUID();
       tempType2.name = "Movies";
       types.push(tempType2);
 
@@ -58,24 +63,28 @@ export default function HomePage() {
     // TODO: REMOVE AFTER TESTING
     {
       var file : VideoFile = new VideoFile();
+      file.generateUUID();
       file.fileName = "Men's Fashion";
       file.filePath = "C:/mens_fashion.mp4";
       file.duration = 360;
       file.type = tempType;
       file.muted = false;
       var playlistFile : PlaylistFile = new PlaylistFile();
+      playlistFile.generateUUID();
       playlistFile.file = file;
       playlistFile.timeStart = 0;
       playlistFile.timeEnd = 1410;
       playlistFile.volume = 100;
   
       var file1 : VideoFile = new VideoFile();
+      file1.generateUUID();
       file1.fileName = "Doctor Who Season 3 Episode 1";
       file1.filePath = "C:/Users/fang2/OneDrive/Documents/coding/RBMP/sample_video/doctor_who_3_1.mp4";
       file1.duration = 360;
       file1.type = tempType2;
       file1.muted = false;
       var playlistFile1 : PlaylistFile = new PlaylistFile();
+      playlistFile1.generateUUID();
       playlistFile1.file = file1;
       playlistFile1.timeStart = 1411;
       playlistFile1.timeEnd = 1439;
@@ -91,9 +100,11 @@ export default function HomePage() {
 
     {
       var config : PlaylistConfig = new PlaylistConfig();
+      config.generateUUID();
       var slots : Array<PlaylistSlot> = new Array<PlaylistSlot>();
       
       var tempSlot = new PlaylistSlot();
+      tempSlot.generateUUID();
       tempSlot.startTime = 0;
       tempSlot.endTime = 59;
       tempSlot.type = tempType;
@@ -102,6 +113,7 @@ export default function HomePage() {
       slots.push(tempSlot);
       
       var tempSlot1 = new PlaylistSlot();
+      tempSlot1.generateUUID();
       tempSlot1.startTime = 60;
       tempSlot1.endTime = 119;
       tempSlot1.type = tempType;
@@ -110,6 +122,7 @@ export default function HomePage() {
       slots.push(tempSlot1);
   
       var tempSlot2 = new PlaylistSlot();
+      tempSlot2.generateUUID();
       tempSlot2.startTime = 120;
       tempSlot2.endTime = 719;
       tempSlot2.type = tempType;
@@ -118,6 +131,7 @@ export default function HomePage() {
       slots.push(tempSlot2);
   
       var tempSlot3 = new PlaylistSlot();
+      tempSlot3.generateUUID();
       tempSlot3.startTime = 720;
       tempSlot3.endTime = 889;
       tempSlot3.type = tempType;
@@ -126,6 +140,7 @@ export default function HomePage() {
       slots.push(tempSlot3);
   
       var tempSlot4 = new PlaylistSlot();
+      tempSlot4.generateUUID();
       tempSlot4.startTime = 890;
       tempSlot4.endTime = 1079;
       tempSlot4.type = tempType;
@@ -134,6 +149,7 @@ export default function HomePage() {
       slots.push(tempSlot4);
   
       var tempSlot5 = new PlaylistSlot();
+      tempSlot5.generateUUID();
       tempSlot5.startTime = 1080;
       tempSlot5.endTime = 1259;
       tempSlot5.type = tempType;
@@ -142,6 +158,7 @@ export default function HomePage() {
       slots.push(tempSlot5);
   
       var tempSlot6 = new PlaylistSlot();
+      tempSlot6.generateUUID();
       tempSlot6.startTime = 1260;
       tempSlot6.endTime = 1439;
       tempSlot6.type = tempType;
@@ -180,48 +197,51 @@ export default function HomePage() {
   useEffect(() => {
     console.log("HOME REFRESH");
 
-    // Load configs
-    loadConfigs().then((conf) => {
-      if (conf.length === 0) {
-        const configs = setup().configs;
-        writeData("configs.conf", configs);
-      } else {
-        setConfigs(conf);
-      }
-    }).catch((e) => {
-      console.log(e);
-      const configs = setup().configs;
-      writeData("configs.conf", configs);
-    });
+    var setupResults;
 
-    // Load types
-    loadTypes().then((t) => {
-      if (t.length === 0) {
-        const types = setup().types;
-        writeData("types.conf", types);
-      } else {
-        setTypes(t);
-      }
-    }).catch((e) => {
-      console.log(e);
-      const types = setup().types;
-      writeData("types.conf", types);
-    }); 
+    if (!runOnce) {
+      // Load configs
+      loadConfigs().then((conf) => {
+        if (conf.length === 0) {
+          if (setupResults == null || setupResults == undefined) {
+            setupResults = setup();
+          }
+          const configs = setupResults.configs;
+          writeData("configs.conf", configs);
+        } else {
+          setConfigs(conf);
+        }
+      });
 
+      // Load types
+      loadTypes().then((t) => {
+        if (t.length === 0) {
+          if (setupResults == null || setupResults == undefined) {
+            setupResults = setup();
+          }
+          const types = setupResults.types;
+          writeData("types.conf", types);
+        } else {
+          setTypes(t);
+        }
+      })
 
-    // Load files
-    loadFiles().then((f) => {
-      if (f.length === 0) {
-        const files = setup().files;
-        writeData("files.conf", files);
-      } else {
-        setFiles(f);
-      }
-    }).catch((e) => {
-      console.log(e);
-      const files = setup().files;
-      writeData("files.conf", files);
-    });  
+      // Load files
+      loadFiles().then((f) => {
+        if (f.length === 0) {
+          if (setupResults == null || setupResults == undefined) {
+            setupResults = setup();
+          }
+          const files = setupResults.files;
+          writeData("files.conf", files);
+        } else {
+          setFiles(f);
+        }
+      })
+      
+      setRunOnce(true);
+    }
+    
 
     if (typeof window !== "undefined") {
       setHasWindow(true);

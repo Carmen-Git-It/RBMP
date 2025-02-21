@@ -11,7 +11,7 @@ export default class PlaylistSlot implements Serializable<PlaylistSlot>{
     volume: number;
     muted: boolean;
 
-    constructor() {
+    generateUUID() {
         this.id = uuidv4();
     }
 

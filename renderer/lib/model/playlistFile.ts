@@ -11,7 +11,7 @@ export default class PlaylistFile implements Serializable<PlaylistFile>{
     muted: boolean;
     volume: number;     // From 0-100
 
-    constructor() {
+    generateUUID() {
         this.id = uuidv4();
     }
 

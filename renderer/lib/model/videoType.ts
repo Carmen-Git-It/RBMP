@@ -5,7 +5,7 @@ export default class VideoType implements Serializable<VideoType> {
     id: String
     name: String
     
-    constructor() {
+    generateUUID() {
         this.id = uuidv4();
     }
 
