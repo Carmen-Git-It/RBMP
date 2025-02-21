@@ -30,9 +30,14 @@ export default function Config() {
         setTypeModalOpen(true);
     }
 
-    // Save new type and set slot type to new type
     function handleCloseTypeModal() {
+        setTypeModalOpen(false);
+    }
+
+    // Save new type and set slot type to new type
+    function handleModalSave() {
         var tempType : VideoType = new VideoType();
+        tempType.generateUUID();
         tempType.name = newTypeName;
 
         var tempTypes : Array<VideoType> = types.slice();
@@ -43,6 +48,10 @@ export default function Config() {
         configs[currentConfig].slots[newTypeSlot].type = types[types.length - 1];
         slotTypes[newTypeSlot] = tempType;
 
+        setTypeModalOpen(false);
+    }
+
+    function handleModalCancel() {
         setTypeModalOpen(false);
     }
 
@@ -170,8 +179,11 @@ export default function Config() {
                     boxShadow: 24, 
                     p: 4,}}>
                     <Typography id="type-modal-title" variant="h6" component="h2">Create New Type</Typography>
-                    <TextField id="new-type-name" label="Name" variant="outlined" onChange={handleChangeTypeName} error={newTypeName === ""}/>
-
+                    <TextField id="new-type-name" label="Name" variant="outlined" defaultValue="TypeName" onChange={handleChangeTypeName} error={newTypeName === ""} sx={{paddingTop: 2}}/>
+                    <Stack spacing={2} direction="row" sx={{paddingTop: 2}}>
+                        <Button variant="outlined" color="error" onClick={handleModalCancel}>Cancel</Button>
+                        <Button variant="contained" color="success" onClick={handleModalSave}>Save Type</Button>
+                    </Stack>
                 </Box>
             </Modal>
             <Grid container spacing={2} sx={{paddingBottom: 1}}>

@@ -1,5 +1,5 @@
 import path from 'path'
-import { app, ipcMain } from 'electron'
+import { app, ipcMain, dialog } from 'electron'
 import serve from 'electron-serve'
 import { createWindow } from './helpers'
 import fs from 'fs';
@@ -49,6 +49,25 @@ const loadFile = (fileName) => {
   }
 }
 
+
+// Returns an Object with directory path Keys, containing String Arrays of file names
+const selectMediaDir = async (window) => {
+  const { canceled, filePaths } = await dialog.showOpenDialog(window, {title: "Select Media Folder",
+    filters: [{name: "Videos", extensions: ['mkv', 'avi', 'mp4', 'mov', 'wmv', 'flv', 'webm']}],
+    properties: ['openDirectory', 'multiSelections']
+  });
+  // TODO: Get duration
+  // TODO: Filter out non-video files?
+  if (!canceled) {
+    var files = {}
+    for (var filePath of filePaths) {
+      const f = fs.readdirSync(filePath);
+      files[filePath] = f;
+    }
+    return files;
+  } else return null;
+}
+
 ;(async () => {
   await app.whenReady();
 
@@ -65,6 +84,11 @@ const loadFile = (fileName) => {
       webSecurity: false,
       preload: path.join(__dirname, 'preload.js'),
     },
+  });
+
+  ipcMain.handle('selectMediaDir', async(event, args) => {
+    const data = selectMediaDir(win);
+    return data;
   });
 
   if (isProd) {

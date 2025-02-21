@@ -4,7 +4,6 @@ import VideoType from "./model/videoType";
 export default async function loadTypes() {
     const data = await window.electronAPI.openFile('openFile', {fileName: 'types.conf'})
 
-    console.log(data);
     if (data == null){
         return new Array<VideoType>();
     }

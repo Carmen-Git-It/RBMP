@@ -224,7 +224,7 @@ export default function HomePage() {
         } else {
           setTypes(t);
         }
-      })
+      });
 
       // Load files
       loadFiles().then((f) => {
@@ -237,7 +237,7 @@ export default function HomePage() {
         } else {
           setFiles(f);
         }
-      })
+      });
       
       setRunOnce(true);
     }

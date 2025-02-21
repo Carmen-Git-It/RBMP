@@ -2,8 +2,7 @@ import VideoFile from "./model/videoFile";
 
 export default async function loadFiles() {
     const data = await window.electronAPI.openFile('openFile', {fileName: 'files.conf'})
-
-    console.log(data);
+    
     if (data == null){
         return new Array<VideoFile>();
     }

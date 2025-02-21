@@ -3,7 +3,6 @@ import PlaylistConfig from "./model/playlistConfig";
 export default async function loadConfigs() {
     const data = await window.electronAPI.openFile('openFile', {fileName: 'configs.conf'})
 
-    console.log(data);
     if (data == null){
         return new Array<PlaylistConfig>();
     }

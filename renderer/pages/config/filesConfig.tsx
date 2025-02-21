@@ -2,6 +2,7 @@ import { Button, List, ListItem, ListItemText, Paper, Stack, Typography } from "
 import { useAtom } from "jotai";
 import React from "react";
 import { filesAtom } from "../../store/store";
+import AddFolder from "./addFolder";
 
 
 export default function FilesConfig() {
@@ -9,14 +10,6 @@ export default function FilesConfig() {
         
     function handleAddFile() {
         // TODO: Handle add file
-    }
-
-    function handleAddFolder() {
-        // TODO: Handle add folder, prompt for tag or use folder name as tag
-
-        // Receive list of all filenames in the folder, along with the folder name
-        // Store just the folder name for later scanning
-        // Add file scan button
     }
 
     function handleAddArchive() {
@@ -30,7 +23,7 @@ export default function FilesConfig() {
         <React.Fragment>
             <Paper elevation={3} sx={{padding: 2}}>
                 <Button variant="contained" onClick={handleAddFile} sx={{marginRight: 2}}>Add File</Button>
-                <Button variant="contained" onClick={handleAddFolder} sx={{marginRight: 2}}>Add Folder</Button>
+                <AddFolder/>
                 <Button variant="contained" onClick={handleAddArchive}>Add Archive</Button>
                 <Stack
                 spacing={2}>
