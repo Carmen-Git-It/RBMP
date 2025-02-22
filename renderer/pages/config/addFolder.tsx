@@ -19,7 +19,7 @@ export default function AddFolder() {
     const [listExpanded, setListExpanded] = useState(new Array<boolean>(100));
 
     const [typeModalOpen, setTypeModalOpen] = useState(false);
-    const [newTypeName, setNewTypeName] = useState("");
+    const [newTypeName, setNewTypeName] = useState("TypeName");
 
     useEffect(() => {
         if (folderData) {
@@ -27,11 +27,7 @@ export default function AddFolder() {
         }
     }, [folderData]);
 
-    // Type modal
-    function handleOpenTypeModal() {
-        setTypeModalOpen(true);
-    }
-
+    // Type Modal
     function handleChangeTypeName(e) {
         setNewTypeName(e.target.value);
     }
@@ -39,7 +35,6 @@ export default function AddFolder() {
     function handleCloseTypeModal() {
         setTypeModalOpen(false);
     }
-
     
     function handleTypeModalCancel() {
         setTypeModalOpen(false);

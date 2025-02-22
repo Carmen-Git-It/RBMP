@@ -6,6 +6,8 @@ import VideoType from "../../lib/model/videoType";
 import writeData from "../../lib/writeData";
 import FilesConfig from "./filesConfig";
 
+// TODO: Refactor this monstrosity
+
 export default function Config() {
     const [configs, setConfigs] = useAtom(playlistConfigAtom);
 
@@ -188,7 +190,7 @@ export default function Config() {
             </Modal>
             <Grid container spacing={2} sx={{paddingBottom: 1}}>
                 <Grid item md={6}>
-                    <Paper elevation={3} sx={{padding: 2}}>
+                    <Paper elevation={3} sx={{padding: 2, maxHeight: 550, overflow: 'auto'}}>
                         <Stack
                             spacing={2}>
                             <FormControl fullWidth>
@@ -202,7 +204,7 @@ export default function Config() {
                                         {configs.map((config, key) => <MenuItem key={key} value={key}>{config.name}</MenuItem>) }
                                 </Select>
                             </FormControl>
-                            <Box sx={{borderBottom: 1, borderColor: 'divider', marginBottom: 3, maxHeight: 400, paddingTop: 1, paddingRight: 2, overflow: 'auto'}}>
+                            <Box sx={{borderBottom: 1, borderColor: 'divider', marginBottom: 3, paddingTop: 1, paddingRight: 2}}>
                                 <Stack
                                     spacing={2}>
                                     <TextField 

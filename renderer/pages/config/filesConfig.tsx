@@ -3,6 +3,7 @@ import { useAtom } from "jotai";
 import React, { useEffect } from "react";
 import { filesAtom } from "../../store/store";
 import AddFolder from "./addFolder";
+import AddFile from "./addFile";
 
 
 export default function FilesConfig() {
@@ -12,9 +13,7 @@ export default function FilesConfig() {
 
     }, [files])
         
-    function handleAddFile() {
-        // TODO: Handle add file
-    }
+
 
     function handleAddArchive() {
         // TODO: Add folder and all subfolders, use folder names as tags
@@ -26,7 +25,7 @@ export default function FilesConfig() {
     return (
         <React.Fragment>
             <Paper elevation={3} sx={{padding: 2}}>
-                <Button variant="contained" onClick={handleAddFile} sx={{marginRight: 2}}>Add File</Button>
+                <AddFile/>
                 <AddFolder/>
                 <Button variant="contained" onClick={handleAddArchive}>Add Archive</Button>
                 <Stack

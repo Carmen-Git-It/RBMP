@@ -52,7 +52,7 @@ const loadFile = (fileName) => {
 
 const validMediaTypes = ['.mkv', '.avi', '.mp4', '.mov', '.wmv', '.flv', '.webm'];
 
-// Returns an Object with directory path Keys, containing String Arrays of file names
+// Returns an Object with directory path Keys, containing arrays of objects {dirPath: [{filePath: "filePath", duration: "durationInS"}, {...}, {...}], dirPath2: [{...}, {...}]}
 const selectMediaDir = async (window) => {
   const { canceled, filePaths } = await dialog.showOpenDialog(window, {title: "Select Media Folder",
     filters: [{name: "Videos", extensions: ['mkv', 'avi', 'mp4', 'mov', 'wmv', 'flv', 'webm']}],
@@ -74,6 +74,22 @@ const selectMediaDir = async (window) => {
       files[filePath] = arr;
     }
     return files;
+  } else return null;
+}
+
+// Returns an object with properties filePath and duration
+const selectMediaFile = async (window) => {
+  const { canceled, filePaths } = await dialog.showOpenDialog(window, {title: "Select Media File",
+    filters: [{name: "Videos", extensions: ['mkv', 'avi', 'mp4', 'mov', 'wmv', 'flv', 'webm']}]
+  });
+
+  if (!canceled) {
+    var file = {};
+    file["filePath"] = filePaths[0];
+    const d = await getVideoDurationInSeconds(filePaths[0]);
+    file["duration"] = d;
+
+    return file;
   } else return null;
 }
 
@@ -99,6 +115,11 @@ const selectMediaDir = async (window) => {
     const data = selectMediaDir(win);
     return data;
   });
+
+  ipcMain.handle('selectMediaFile', async (event, args) => {
+    const data = selectMediaFile(win);
+    return data;
+  })
 
   if (isProd) {
     await win.loadURL('app://./home');

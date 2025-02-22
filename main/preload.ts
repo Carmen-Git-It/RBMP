@@ -8,6 +8,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   selectMediaDir: (channel, args) => {
     return ipcRenderer.invoke('selectMediaDir', args);
   },
+  selectMediaFile: (channel, args) => {
+    return ipcRenderer.invoke('selectMediaFile', args);
+  },
   send: (channel, args) => {
     ipcRenderer.send(channel, args);
   }
