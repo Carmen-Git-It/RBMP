@@ -5,6 +5,7 @@ import { useAtom } from "jotai";
 import { filesAtom, typesAtom } from "../../store/store";
 import VideoType from "../../lib/model/videoType";
 import writeData from "../../lib/writeData";
+import VideoFile from "../../lib/model/videoFile";
 
 export default function AddFolder() {
     const [types, setTypes] = useAtom<Array<VideoType>>(typesAtom);
@@ -55,6 +56,7 @@ export default function AddFolder() {
         writeData("types.conf", tempTypes);
 
         setFolderType(tempType);
+        setTypeModalOpen(false);
     }
 
     // Folder modal
@@ -65,16 +67,23 @@ export default function AddFolder() {
 
     function handleModalSave() {
         const tempFiles = files.slice();
-        for (const dir of folderData) {
-            for (const filename of folderData[dir]) {
-                // TODO: Rework this to work with detailed file data including duration
-                // TODO: Save
+        for (const dir of Object.keys(folderData)) {
+            for (const file of folderData[dir]) {
+                const tempFile = new VideoFile();
+                tempFile.generateUUID();
+                tempFile.fileName = file.filePath;
+                tempFile.filePath = dir + "\\" + file.filePath;
+                tempFile.duration = file.duration;
+                tempFile.muted = false;
+                tempFile.type = folderType;
+
+                tempFiles.push(tempFile);
             }
         }
-        //tempFiles.push(folderData)
-
-
+        setFiles(tempFiles);
         setListExpanded(new Array(100));
+        writeData("files.conf", tempFiles);
+        setModalOpen(false);
     }
 
     function handleModalClose() {
@@ -85,6 +94,7 @@ export default function AddFolder() {
         selectMediaDir().then((data) => {
             if (data == null || Object.keys(data).length === 0) {
                 setModalOpen(false);
+                return;
             }
             setFolderData(data);
 
@@ -104,7 +114,7 @@ export default function AddFolder() {
 
     function handleChangeType(e : SelectChangeEvent) {
         if (e.target.value === types[0].id) {
-            
+            setTypeModalOpen(true);
         } else {
             const t = types.filter((tmp) => tmp.id === e.target.value)[0];
             setFolderType(t);
@@ -189,9 +199,10 @@ export default function AddFolder() {
                                     <Typography variant="h6" sx={{paddingTop: 1, paddingLext: 1, textDecoration: "underline"}}>{index}</Typography>
                                     <Button onClick={() => {changeListStatus(key)}}>{(listExpanded[key] === undefined || listExpanded[key]) ? "Hide Files" : "Show Files"}</Button>
                                     <List sx={{paddingTop: 1, paddingBottom: 2}}>
-                                        {(listExpanded[key] === undefined || listExpanded[key]) && folderData[index].map((filepath : String, fileKey : number) => 
+                                        {(listExpanded[key] === undefined || listExpanded[key]) && folderData[index].map((file, fileKey : number) => 
                                                 <ListItem key={fileKey + 20000}>
-                                                    <ListItemText primary={filepath}/>
+                                                    <ListItemText primary={file.filePath}/>
+                                                    <ListItemText primary={"Duration: " + file.duration + "s"}></ListItemText>
                                                 </ListItem>
                                             )}
                                     </List>

@@ -1,12 +1,16 @@
 import { Button, List, ListItem, ListItemText, Paper, Stack, Typography } from "@mui/material";
 import { useAtom } from "jotai";
-import React from "react";
+import React, { useEffect } from "react";
 import { filesAtom } from "../../store/store";
 import AddFolder from "./addFolder";
 
 
 export default function FilesConfig() {
     const [files, setFiles] = useAtom(filesAtom);
+
+    useEffect(() => {
+
+    }, [files])
         
     function handleAddFile() {
         // TODO: Handle add file

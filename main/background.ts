@@ -3,6 +3,7 @@ import { app, ipcMain, dialog } from 'electron'
 import serve from 'electron-serve'
 import { createWindow } from './helpers'
 import fs from 'fs';
+import { getVideoDurationInSeconds } from 'get-video-duration'
 
 const isProd = process.env.NODE_ENV === 'production'
 
@@ -49,6 +50,7 @@ const loadFile = (fileName) => {
   }
 }
 
+const validMediaTypes = ['.mkv', '.avi', '.mp4', '.mov', '.wmv', '.flv', '.webm'];
 
 // Returns an Object with directory path Keys, containing String Arrays of file names
 const selectMediaDir = async (window) => {
@@ -57,12 +59,19 @@ const selectMediaDir = async (window) => {
     properties: ['openDirectory', 'multiSelections']
   });
   // TODO: Get duration
-  // TODO: Filter out non-video files?
   if (!canceled) {
-    var files = {}
+    var files = {};
     for (var filePath of filePaths) {
       const f = fs.readdirSync(filePath);
-      files[filePath] = f;
+      const arr = new Array();
+
+      files[filePath] = f.filter((p) => validMediaTypes.includes(path.extname(p)));
+      for (const p of files[filePath]) {
+        const d = await getVideoDurationInSeconds(filePath + "/" + p);
+        arr.push({filePath: p, duration: d});
+      }
+
+      files[filePath] = arr;
     }
     return files;
   } else return null;
