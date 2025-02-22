@@ -1,0 +1,14 @@
+# Ignore artifacts:
+app
+dist
+node_modules
+.vscode
+renderer/.next
+.gitignore
+.prettierignore
+.prettierrc
+electron-builder.yml
+eslint.config.mjs
+package.json
+package-lock.json
+tsconfig.json

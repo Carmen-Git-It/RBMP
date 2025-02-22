@@ -1,22 +1,22 @@
 import Serializable from "../serializable";
-import {v4 as uuidv4} from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 export default class VideoType implements Serializable<VideoType> {
-    id: String
-    name: String
-    
-    generateUUID() {
-        this.id = uuidv4();
-    }
+  id: String;
+  name: String;
 
-    deserialize(input) {
-        this.id = input.id;
-        this.name = input.name;
+  generateUUID() {
+    this.id = uuidv4();
+  }
 
-        return this;
-    }
+  deserialize(input) {
+    this.id = input.id;
+    this.name = input.name;
 
-    serialize() {
-        return JSON.stringify(this);
-    }
+    return this;
+  }
+
+  serialize() {
+    return JSON.stringify(this);
+  }
 }
