@@ -18,6 +18,7 @@ import loadConfigs from "../lib/loadConfigs";
 import writeData from "../lib/writeData";
 import loadTypes from "../lib/loadTypes";
 import loadFiles from "../lib/loadFiles";
+import loadPlaylist from "../lib/loadPlaylist";
 
 const Root = styled("div")(() => {
   return {
@@ -90,11 +91,6 @@ export default function HomePage() {
       playlistFile1.timeStart = 1411;
       playlistFile1.timeEnd = 1439;
       playlistFile1.volume = 100;
-
-      const temp: PlaylistFile[] = new Array<PlaylistFile>();
-      temp.push(playlistFile);
-      temp.push(playlistFile1);
-      setPlaylist(temp);
     }
 
     // TODO REMOVE AFTER TESTING
@@ -236,6 +232,12 @@ export default function HomePage() {
           writeData("files.conf", files);
         } else {
           setFiles(f);
+        }
+      });
+
+      loadPlaylist().then((p) => {
+        if (p) {
+          setPlaylist(p);
         }
       });
 
