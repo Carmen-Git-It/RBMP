@@ -1,5 +1,5 @@
 import Serializable from "../serializable";
-import PlaylistSlot from "./playlistSlot";
+import PlaylistConfigSlot from "./playlistConfigSlot";
 import { v4 as uuidv4 } from "uuid";
 
 export default class PlaylistConfig implements Serializable<PlaylistConfig> {
@@ -9,7 +9,7 @@ export default class PlaylistConfig implements Serializable<PlaylistConfig> {
   description: String;
   start_time: number;
   end_time: number;
-  slots: PlaylistSlot[];
+  slots: PlaylistConfigSlot[];
 
   generateUUID() {
     this.id = uuidv4();
@@ -23,7 +23,7 @@ export default class PlaylistConfig implements Serializable<PlaylistConfig> {
     this.end_time = input.end_time;
     this.slots = new Array();
     for (const slot of input.slots) {
-      this.slots.push(new PlaylistSlot().deserialize(slot));
+      this.slots.push(new PlaylistConfigSlot().deserialize(slot));
     }
 
     return this;

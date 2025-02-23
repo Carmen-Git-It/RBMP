@@ -11,7 +11,7 @@ import { filesAtom, playlistPlayerAtom, typesAtom } from "../store/store";
 import { playlistConfigAtom } from "../store/store";
 import VideoFile from "../lib/model/videoFile";
 import PlaylistFile from "../lib/model/playlistFile";
-import PlaylistSlot from "../lib/model/playlistSlot";
+import PlaylistConfigSlot from "../lib/model/playlistConfigSlot";
 import VideoType from "../lib/model/videoType";
 import PlaylistConfig from "../lib/model/playlistConfig";
 import loadConfigs from "../lib/loadConfigs";
@@ -102,9 +102,9 @@ export default function HomePage() {
     {
       const config: PlaylistConfig = new PlaylistConfig();
       config.generateUUID();
-      const slots: PlaylistSlot[] = new Array<PlaylistSlot>();
+      const slots: PlaylistConfigSlot[] = new Array<PlaylistConfigSlot>();
 
-      const tempSlot = new PlaylistSlot();
+      const tempSlot = new PlaylistConfigSlot();
       tempSlot.generateUUID();
       tempSlot.startTime = 0;
       tempSlot.endTime = 59;
@@ -113,7 +113,7 @@ export default function HomePage() {
       tempSlot.volume = 50;
       slots.push(tempSlot);
 
-      const tempSlot1 = new PlaylistSlot();
+      const tempSlot1 = new PlaylistConfigSlot();
       tempSlot1.generateUUID();
       tempSlot1.startTime = 60;
       tempSlot1.endTime = 119;
@@ -122,7 +122,7 @@ export default function HomePage() {
       tempSlot1.volume = 20;
       slots.push(tempSlot1);
 
-      const tempSlot2 = new PlaylistSlot();
+      const tempSlot2 = new PlaylistConfigSlot();
       tempSlot2.generateUUID();
       tempSlot2.startTime = 120;
       tempSlot2.endTime = 719;
@@ -131,7 +131,7 @@ export default function HomePage() {
       tempSlot2.volume = 70;
       slots.push(tempSlot2);
 
-      const tempSlot3 = new PlaylistSlot();
+      const tempSlot3 = new PlaylistConfigSlot();
       tempSlot3.generateUUID();
       tempSlot3.startTime = 720;
       tempSlot3.endTime = 889;
@@ -140,7 +140,7 @@ export default function HomePage() {
       tempSlot3.volume = 100;
       slots.push(tempSlot3);
 
-      const tempSlot4 = new PlaylistSlot();
+      const tempSlot4 = new PlaylistConfigSlot();
       tempSlot4.generateUUID();
       tempSlot4.startTime = 890;
       tempSlot4.endTime = 1079;
@@ -149,7 +149,7 @@ export default function HomePage() {
       tempSlot4.volume = 0;
       slots.push(tempSlot4);
 
-      const tempSlot5 = new PlaylistSlot();
+      const tempSlot5 = new PlaylistConfigSlot();
       tempSlot5.generateUUID();
       tempSlot5.startTime = 1080;
       tempSlot5.endTime = 1259;
@@ -158,7 +158,7 @@ export default function HomePage() {
       tempSlot5.volume = 100;
       slots.push(tempSlot5);
 
-      const tempSlot6 = new PlaylistSlot();
+      const tempSlot6 = new PlaylistConfigSlot();
       tempSlot6.generateUUID();
       tempSlot6.startTime = 1260;
       tempSlot6.endTime = 1439;
