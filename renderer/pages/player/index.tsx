@@ -3,7 +3,14 @@
 
 import React, { CSSProperties, useState, useEffect, useRef } from "react";
 
-import { Button, Stack, Grid, Paper, Typography, Snackbar } from "@mui/material";
+import {
+  Button,
+  Stack,
+  Grid,
+  Paper,
+  Typography,
+  Snackbar,
+} from "@mui/material";
 import screenfull from "screenfull";
 import ReactPlayer from "react-player";
 import { useAtom, useAtomValue } from "jotai";
@@ -35,7 +42,6 @@ export default function Player() {
 
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-
 
   const [playlist, setPlaylist] = useAtom(playlistPlayerAtom);
   const configs = useAtomValue(playlistConfigAtom);
@@ -80,7 +86,7 @@ export default function Player() {
         setContent("file://" + video.file.filePath);
         setContentTitle(video.file.fileName + "");
         setCurrentFile(video);
-        setIsReady(false);        
+        setIsReady(false);
       } else {
         setContent("");
         setContentTitle("No video set to play at this time.");
@@ -98,11 +104,11 @@ export default function Player() {
         const date = new Date();
         const minutes =
           date.getMinutes() + date.getHours() * 60 + date.getSeconds() / 60;
-        player?.current?.seekTo((minutes - currentFile.timeStart) * 60)
+        player?.current?.seekTo((minutes - currentFile.timeStart) * 60);
       }
     }
     setIsReady(true);
-  }, [isReady])
+  }, [isReady]);
 
   function handleContentEnd() {
     const date = new Date();
@@ -162,7 +168,14 @@ export default function Player() {
       <Grid container spacing={0}>
         <Grid item sm={6} md={6} style={wrapper_style}>
           {hasWindow && (
-            <VPlayer player={player} content={content} muted={muted} player_style={player_style} play={play} handleContentEnd={handleContentEnd}/>
+            <VPlayer
+              player={player}
+              content={content}
+              muted={muted}
+              player_style={player_style}
+              play={play}
+              handleContentEnd={handleContentEnd}
+            />
           )}
         </Grid>
         <Grid item sm={6} md={6}>
@@ -200,7 +213,7 @@ export default function Player() {
         autoHideDuration={5000}
         message={snackbarMessage}
         onClose={handleSnackbarClose}
-        />
+      />
     </React.Fragment>
   );
 }
