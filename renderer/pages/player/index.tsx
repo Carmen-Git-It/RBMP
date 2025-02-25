@@ -1,9 +1,9 @@
 //TODO: Remove when implemented
 /* eslint no-unused-vars: 0 */
 
-import React, { CSSProperties, useState, useEffect } from "react";
+import React, { CSSProperties, useState, useEffect, useRef } from "react";
 
-import { Button, Stack, Grid, Paper, Typography } from "@mui/material";
+import { Button, Stack, Grid, Paper, Typography, Snackbar } from "@mui/material";
 import screenfull from "screenfull";
 import ReactPlayer from "react-player";
 import { useAtom, useAtomValue } from "jotai";
@@ -16,12 +16,12 @@ import {
 import PlaylistFile from "../../lib/model/playlistFile";
 import PlaylistSlot from "../../lib/model/playlistSlot";
 import generatePlaylist from "../../lib/generatePlaylist";
+import VPlayer from "../config/player";
 
 export default function Player() {
   const [fullScreen, setFullScreen] = useState(false);
   const [muted, setMuted] = useState(false);
-  const [play, setPlay] = useState(false);
-  // const [playlist, setPlaylist] = useState(new Array<PlaylistFile>());
+  const [play, setPlay] = useState(true);
   const [updatePlaylist, setUpdatePlaylist] = useState(true);
   const [day, setDay] = useState(new Date().getDate());
   const [content, setContent] = useState("");
@@ -29,6 +29,13 @@ export default function Player() {
   const [currentMinute, setCurrentMinute] = useState(
     new Date().getHours() * 60 + new Date().getMinutes(),
   );
+  const player = useRef<ReactPlayer>();
+  const [isReady, setIsReady] = useState(false);
+  const [currentFile, setCurrentFile] = useState<PlaylistFile>();
+
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+
 
   const [playlist, setPlaylist] = useAtom(playlistPlayerAtom);
   const configs = useAtomValue(playlistConfigAtom);
@@ -55,16 +62,10 @@ export default function Player() {
 
   useEffect(() => {
     console.log("PLAYLIST RE-RENDER");
-    if (updatePlaylist) {
-      // Basically force an update of the playlist atom
-      // Maybe just useEffect for when the atom is updated? and update it externally? mainthread? ew then switch to electron store ig and sendevent when it's updated
-    }
 
     const date = new Date();
     const minutes =
       date.getMinutes() + date.getHours() * 60 + date.getSeconds() / 60;
-
-    // TODO: Track video to the correct point based on start_time vs. now
 
     if (playlist !== null && playlist !== undefined) {
       const slots = playlist.slots.filter((item: PlaylistSlot) => {
@@ -78,6 +79,8 @@ export default function Player() {
       if (video) {
         setContent("file://" + video.file.filePath);
         setContentTitle(video.file.fileName + "");
+        setCurrentFile(video);
+        setIsReady(false);        
       } else {
         setContent("");
         setContentTitle("No video set to play at this time.");
@@ -87,6 +90,19 @@ export default function Player() {
       setContentTitle("No playlist set");
     }
   }, [playlist, currentMinute]);
+
+  // Track the video to the correct time
+  useEffect(() => {
+    if (!isReady) {
+      if (player.current) {
+        const date = new Date();
+        const minutes =
+          date.getMinutes() + date.getHours() * 60 + date.getSeconds() / 60;
+        player?.current?.seekTo((minutes - currentFile.timeStart) * 60)
+      }
+    }
+    setIsReady(true);
+  }, [isReady])
 
   function handleContentEnd() {
     const date = new Date();
@@ -105,6 +121,7 @@ export default function Player() {
     if (video) {
       setContent("file://" + video.file.filePath);
       setContentTitle(video.file.fileName + "");
+      setIsReady(false);
     } else {
       setContent("");
       setContentTitle("No video set to play at this time.");
@@ -124,9 +141,14 @@ export default function Player() {
       if (p) {
         setPlaylist(p);
       } else {
-        // TODO: Snackbar playlist generation failed
+        setSnackbarMessage("Error: Problem generating snackbar");
+        setSnackbarOpen(true);
       }
     });
+  }
+
+  function handleSnackbarClose() {
+    setSnackbarOpen(false);
   }
 
   const wrapper_style: CSSProperties = {
@@ -140,16 +162,7 @@ export default function Player() {
       <Grid container spacing={0}>
         <Grid item sm={6} md={6} style={wrapper_style}>
           {hasWindow && (
-            <ReactPlayer
-              className="react-player"
-              url={content}
-              width="100%"
-              height="100%"
-              muted={muted}
-              style={player_style}
-              playing={play}
-              onEnded={handleContentEnd}
-            />
+            <VPlayer player={player} content={content} muted={muted} player_style={player_style} play={play} handleContentEnd={handleContentEnd}/>
           )}
         </Grid>
         <Grid item sm={6} md={6}>
@@ -182,6 +195,12 @@ export default function Player() {
           </Paper>
         </Grid>
       </Grid>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={5000}
+        message={snackbarMessage}
+        onClose={handleSnackbarClose}
+        />
     </React.Fragment>
   );
 }

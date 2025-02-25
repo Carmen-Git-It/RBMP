@@ -18,6 +18,7 @@ export default async function generatePlaylist(
   for (const slot of config.slots) {
     let totalDuration = 0;
     let currentTime = slot.startTime;
+    
     const newSlot = new PlaylistSlot();
     newSlot.startTime = slot.startTime;
     newSlot.endTime = slot.endTime;
