@@ -47,6 +47,9 @@ export default function Config() {
   const [description, setDescription] = useState(
     configs[currentConfig].description,
   );
+  const [currentSlots, setCurrentSlots] = useState(
+    configs[currentConfig].slots.slice(),
+  );
 
   const [typeModalOpen, setTypeModalOpen] = useState(false);
   const [newTypeName, setNewTypeName] = useState("");
@@ -86,15 +89,47 @@ export default function Config() {
     setNewTypeName(e.target.value);
   }
 
-  // useEffect(() => {
-
-  // }, []);
-
   const minutesArr = Array.from({ length: 60 }, (x, i) => i);
   const hoursArr = Array.from({ length: 24 }, (x, i) => i);
 
   function handleChangeCurrentConfig(e: SelectChangeEvent) {
     setCurrentConfig(Number.parseInt(e.target.value));
+  }
+
+  function handleDeleteSlot(index: number) {
+    console.log("Deleting slot: " + index);
+    const tempConfigs = configs;
+    tempConfigs[currentConfig].slots.splice(index, 1);
+
+    const tempStartMinutes = startMinutes;
+    tempStartMinutes.splice(index, 1);
+    console.log(tempStartMinutes);
+    tempStartMinutes.push(undefined);
+    setStartMinutes(tempStartMinutes);
+
+    const tempStartHours = startHours;
+    tempStartHours.splice(index, 1);
+    tempStartHours.push(undefined);
+    setStartHours(tempStartHours);
+
+    const tempEndMinutes = startMinutes;
+    tempEndMinutes.splice(index, 1);
+    console.log(tempEndMinutes);
+    tempEndMinutes.push(undefined);
+    setStartMinutes(tempEndMinutes);
+
+    const tempEndHours = startHours;
+    tempEndHours.splice(index, 1);
+    tempEndHours.push(undefined);
+    setStartHours(tempEndHours);
+
+    const tempSlotTypes = slotTypes;
+    tempSlotTypes.splice(index, 1);
+    tempSlotTypes.push(undefined);
+    setSlotTypes(tempSlotTypes);
+
+    setConfigs(tempConfigs.slice());
+    setCurrentSlots(tempConfigs[currentConfig].slots.slice());
   }
 
   function handleSaveConfig() {
@@ -158,9 +193,9 @@ export default function Config() {
 
   function handleChangeStartMinute(e: SelectChangeEvent<Number>) {
     const index = Number.parseInt(e.target.name);
-    const tempMinutes = startMinutes.slice();
-    tempMinutes[index] = e.target.value;
-    setStartMinutes(tempMinutes);
+    const tempStartMinutes = startMinutes.slice();
+    tempStartMinutes[index] = e.target.value;
+    setStartMinutes(tempStartMinutes);
   }
 
   function handleChangeEndHour(e: SelectChangeEvent<Number>) {
@@ -172,9 +207,9 @@ export default function Config() {
 
   function handleChangeEndMinute(e: SelectChangeEvent<Number>) {
     const index = Number.parseInt(e.target.name);
-    const tempMinutes = endMinutes.slice();
-    tempMinutes[index] = e.target.value;
-    setEndMinutes(tempMinutes);
+    const tempStartMinutes = endMinutes.slice();
+    tempStartMinutes[index] = e.target.value;
+    setEndMinutes(tempStartMinutes);
   }
 
   function handleChangeName(e) {
@@ -184,10 +219,6 @@ export default function Config() {
   function handleChangeDescription(e) {
     setDescription(e.target.value);
   }
-
-  // useEffect(() => {
-
-  // }, [configs, currentConfig]);
 
   return (
     <React.Fragment>
@@ -296,13 +327,20 @@ export default function Config() {
                     onChange={handleChangeDescription}
                   />
                   <Paper elevation={6}>
-                    {configs[currentConfig].slots.map((value, key) => (
-                      <Card
-                        variant="outlined"
-                        key={key + 1200}
-                        sx={{ marginTop: 1 }}
-                      >
-                        <CardHeader title={"Slot " + key} />
+                    {currentSlots.map((value, key) => (
+                      <Card variant="outlined" key={key} sx={{ marginTop: 1 }}>
+                        <CardHeader
+                          title={"Slot " + key}
+                          action={
+                            <Button
+                              variant="outlined"
+                              color="error"
+                              onClick={() => handleDeleteSlot(key)}
+                            >
+                              Delete
+                            </Button>
+                          }
+                        />
                         <CardContent>
                           <FormControl fullWidth>
                             <InputLabel id={"slot-type-select-label" + key}>
@@ -346,6 +384,11 @@ export default function Config() {
                                 id={"slot-hour-select" + key}
                                 name={key + ""}
                                 defaultValue={Math.floor(value.startTime / 60)}
+                                value={
+                                  startHours[key] !== undefined
+                                    ? startHours[key]
+                                    : Math.floor(value.startTime / 60)
+                                }
                                 onChange={handleChangeStartHour}
                                 label="Hour"
                               >
@@ -365,6 +408,11 @@ export default function Config() {
                                 id={"slot-minute-select" + key}
                                 name={key + ""}
                                 defaultValue={value.startTime % 60}
+                                value={
+                                  startMinutes[key] !== undefined
+                                    ? startMinutes[key]
+                                    : Math.floor(value.startTime % 60)
+                                }
                                 onChange={handleChangeStartMinute}
                                 label="Minute"
                               >
@@ -393,6 +441,11 @@ export default function Config() {
                                 id={"slot-end-hour-select" + key}
                                 name={key + ""}
                                 defaultValue={Math.floor(value.endTime / 60)}
+                                value={
+                                  endHours[key] !== undefined
+                                    ? endHours[key]
+                                    : Math.floor(value.endTime / 60)
+                                }
                                 onChange={handleChangeEndHour}
                                 label="Hour"
                               >
@@ -414,6 +467,11 @@ export default function Config() {
                                 id={"slot-end-minute-select" + key}
                                 name={key + ""}
                                 defaultValue={value.endTime % 60}
+                                value={
+                                  endMinutes[key] !== undefined
+                                    ? endMinutes[key]
+                                    : Math.floor(value.endTime % 60)
+                                }
                                 onChange={handleChangeEndMinute}
                                 label="Minute"
                               >
