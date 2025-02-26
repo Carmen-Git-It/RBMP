@@ -14,6 +14,8 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { MobileTimePicker } from "@mui/x-date-pickers/MobileTimePicker";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import React, { useState } from "react";
 import { useAtom, useAtomValue } from "jotai";
 
@@ -25,6 +27,8 @@ import {
   typesAtom,
 } from "../../store/store";
 import writeData from "../../lib/writeData";
+import dayjs, { Dayjs } from "dayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers";
 
 export default function Slots({
   startMinutes,
@@ -45,7 +49,6 @@ export default function Slots({
   const [typeModalOpen, setTypeModalOpen] = useState(false);
   const [newTypeName, setNewTypeName] = useState("");
   const [newTypeSlot, setNewTypeSlot] = useState(0);
-
   const [currentSlots, setCurrentSlots] = useState(
     configs[currentConfig].slots.slice(),
   );
@@ -71,32 +74,22 @@ export default function Slots({
     }
   }
 
-  function handleChangeStartHour(e: SelectChangeEvent<Number>) {
-    const index = Number.parseInt(e.target.name);
-    const tempHours = startHours.slice();
-    tempHours[index] = e.target.value;
+  function handleChangeStartTime(val: Dayjs, index: number) {
+    const tempHours = startHours;
+    tempHours[index] = val.get("hours");
     setStartHours(tempHours);
+    const tempMinutes = startMinutes;
+    tempMinutes[index] = val.get("minutes");
+    setStartMinutes(tempMinutes);
   }
 
-  function handleChangeStartMinute(e: SelectChangeEvent<Number>) {
-    const index = Number.parseInt(e.target.name);
-    const tempStartMinutes = startMinutes.slice();
-    tempStartMinutes[index] = e.target.value;
-    setStartMinutes(tempStartMinutes);
-  }
-
-  function handleChangeEndHour(e: SelectChangeEvent<Number>) {
-    const index = Number.parseInt(e.target.name);
-    const tempHours = endHours.slice();
-    tempHours[index] = e.target.value;
+  function handleChangeEndTime(val: Dayjs, index: number) {
+    const tempHours = endHours;
+    tempHours[index] = val.get("hours");
     setEndHours(tempHours);
-  }
-
-  function handleChangeEndMinute(e: SelectChangeEvent<Number>) {
-    const index = Number.parseInt(e.target.name);
-    const tempStartMinutes = endMinutes.slice();
-    tempStartMinutes[index] = e.target.value;
-    setEndMinutes(tempStartMinutes);
+    const tempMinutes = endMinutes;
+    tempMinutes[index] = val.get("minutes");
+    setEndMinutes(tempMinutes);
   }
 
   function handleNewSlot() {
@@ -199,9 +192,6 @@ export default function Slots({
     setNewTypeName(e.target.value);
   }
 
-  const minutesArr = Array.from({ length: 60 }, (x, i) => i);
-  const hoursArr = Array.from({ length: 24 }, (x, i) => i);
-
   return (
     <React.Fragment>
       <Modal
@@ -301,107 +291,59 @@ export default function Slots({
               </Select>
             </FormControl>
             <Typography>Start Time</Typography>
-            <Stack direction="row" spacing={2} sx={{ paddingTop: 1 }}>
-              <FormControl fullWidth>
-                <InputLabel id={"slot-hour-select-label" + key}>
-                  Hour
-                </InputLabel>
-                <Select
-                  labelId={"slot-hour-select-label" + key}
-                  id={"slot-hour-select" + key}
-                  name={key + ""}
-                  defaultValue={Math.floor(value.startTime / 60)}
-                  value={
-                    startHours[key] !== undefined
-                      ? startHours[key]
-                      : Math.floor(value.startTime / 60)
-                  }
-                  onChange={handleChangeStartHour}
-                  label="Hour"
-                >
-                  {hoursArr.map((val) => (
-                    <MenuItem key={val + 1300} value={val}>
-                      {val}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              <FormControl fullWidth>
-                <InputLabel id={"slot-minute-select-label" + key}>
-                  Minute
-                </InputLabel>
-                <Select
-                  labelId={"slot-minute-select-label" + key}
-                  id={"slot-minute-select" + key}
-                  name={key + ""}
-                  defaultValue={value.startTime % 60}
-                  value={
-                    startMinutes[key] !== undefined
-                      ? startMinutes[key]
-                      : Math.floor(value.startTime % 60)
-                  }
-                  onChange={handleChangeStartMinute}
-                  label="Minute"
-                >
-                  {minutesArr.map((val) => (
-                    <MenuItem key={val + 1400} value={val}>
-                      {val}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Stack>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <MobileTimePicker
+                value={
+                  startMinutes[key] !== undefined
+                    ? startHours[key] !== undefined
+                      ? dayjs(
+                          "2022-04-17T" +
+                            startHours[key] +
+                            ":" +
+                            startMinutes[key],
+                        )
+                      : dayjs(
+                          "2022-04-17T" +
+                            Math.floor(value.startTime / 60) +
+                            ":" +
+                            startMinutes[key],
+                        )
+                    : dayjs(
+                        "2022-04-17T" +
+                          Math.floor(value.startTime / 60) +
+                          ":" +
+                          (value.startTime % 60),
+                      )
+                }
+                onChange={(val) => handleChangeStartTime(val, key)}
+              />
+            </LocalizationProvider>
+
             <Typography>End Time</Typography>
-            <Stack direction="row" spacing={2} sx={{ paddingTop: 1 }}>
-              <FormControl fullWidth>
-                <InputLabel id={"slot-end-hour-select-label" + key}>
-                  Hour
-                </InputLabel>
-                <Select
-                  labelId={"slot-end-hour-select-label" + key}
-                  id={"slot-end-hour-select" + key}
-                  name={key + ""}
-                  defaultValue={Math.floor(value.endTime / 60)}
-                  value={
-                    endHours[key] !== undefined
-                      ? endHours[key]
-                      : Math.floor(value.endTime / 60)
-                  }
-                  onChange={handleChangeEndHour}
-                  label="Hour"
-                >
-                  {hoursArr.map((val) => (
-                    <MenuItem key={val + 1300} value={val}>
-                      {val}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              <FormControl fullWidth>
-                <InputLabel id={"slot-end-minute-select-label" + key}>
-                  Minute
-                </InputLabel>
-                <Select
-                  labelId={"slot-end-minute-select-label" + key}
-                  id={"slot-end-minute-select" + key}
-                  name={key + ""}
-                  defaultValue={value.endTime % 60}
-                  value={
-                    endMinutes[key] !== undefined
-                      ? endMinutes[key]
-                      : Math.floor(value.endTime % 60)
-                  }
-                  onChange={handleChangeEndMinute}
-                  label="Minute"
-                >
-                  {minutesArr.map((val) => (
-                    <MenuItem key={val + 1400} value={val}>
-                      {val}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Stack>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <MobileTimePicker
+                value={
+                  endMinutes[key] !== undefined
+                    ? endHours[key] !== undefined
+                      ? dayjs(
+                          "2022-04-17T" + endHours[key] + ":" + endMinutes[key],
+                        )
+                      : dayjs(
+                          "2022-04-17T" +
+                            Math.floor(value.endTime / 60) +
+                            ":" +
+                            endMinutes[key],
+                        )
+                    : dayjs(
+                        "2022-04-17T" +
+                          Math.floor(value.endTime / 60) +
+                          ":" +
+                          (value.endTime % 60),
+                      )
+                }
+                onChange={(val) => handleChangeEndTime(val, key)}
+              />
+            </LocalizationProvider>
           </CardContent>
         </Card>
       ))}
