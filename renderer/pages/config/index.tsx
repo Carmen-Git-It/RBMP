@@ -26,6 +26,7 @@ import {
 import VideoType from "../../lib/model/videoType";
 import writeData from "../../lib/writeData";
 import FilesConfig from "./filesConfig";
+import PlaylistConfigSlot from "../../lib/model/playlistConfigSlot";
 
 // TODO: Refactor this monstrosity
 
@@ -39,7 +40,7 @@ export default function Config() {
   const [types, setTypes] = useAtom(typesAtom);
 
   const [startMinutes, setStartMinutes] = useState(new Array(100));
-  const [startHours, setStartHours] = useState(new Array(100));
+  const [startHours, setStartHours] = useState(new Array(100)); // TODO: Add and remove array entries manually on config load and slot modification.
   const [endMinutes, setEndMinutes] = useState(new Array(100));
   const [endHours, setEndHours] = useState(new Array(100));
   const [slotTypes, setSlotTypes] = useState(new Array<VideoType>(100));
@@ -94,6 +95,45 @@ export default function Config() {
 
   function handleChangeCurrentConfig(e: SelectChangeEvent) {
     setCurrentConfig(Number.parseInt(e.target.value));
+  }
+
+  function handleNewSlot() {
+    console.log("Adding new slot");
+
+    const tempSlot = new PlaylistConfigSlot();
+    tempSlot.generateUUID();
+    tempSlot.startTime = 0;
+    tempSlot.endTime = 0;
+    tempSlot.muted = false;
+    tempSlot.type = types[1];
+
+    const tempSlotTypes = slotTypes.slice();
+    tempSlotTypes.unshift(undefined);
+    setSlotTypes(tempSlotTypes);
+
+    const tempStartMinutes = startMinutes;
+    tempStartMinutes.unshift(undefined);
+    setStartMinutes(tempStartMinutes);
+
+    const tempStartHours = startHours;
+    tempStartHours.unshift(undefined);
+    setStartHours(tempStartHours);
+
+    const tempEndMinutes = endMinutes;
+    tempEndMinutes.unshift(undefined);
+    setEndMinutes(tempEndMinutes);
+
+    const tempEndHours = endHours;
+    tempEndHours.unshift(undefined);
+    setEndHours(tempEndHours);
+
+    const tempConfigs = configs.slice();
+    tempConfigs[currentConfig].slots.unshift(tempSlot);
+    setConfigs(tempConfigs);
+
+    const tempSlots = currentSlots.slice();
+    tempSlots.unshift(tempSlot);
+    setCurrentSlots(tempSlots);
   }
 
   function handleDeleteSlot(index: number) {
@@ -327,6 +367,14 @@ export default function Config() {
                     onChange={handleChangeDescription}
                   />
                   <Paper elevation={6}>
+                    <Button
+                      variant="outlined"
+                      color="success"
+                      onClick={handleNewSlot}
+                      sx={{ marginTop: 2 }}
+                    >
+                      New Slot
+                    </Button>
                     {currentSlots.map((value, key) => (
                       <Card variant="outlined" key={key} sx={{ marginTop: 1 }}>
                         <CardHeader
