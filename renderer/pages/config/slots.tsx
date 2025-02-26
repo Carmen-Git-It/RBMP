@@ -31,14 +31,10 @@ import dayjs, { Dayjs } from "dayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 
 export default function Slots({
-  startMinutes,
-  setStartMinutes,
-  startHours,
-  setStartHours,
-  endMinutes,
-  setEndMinutes,
-  endHours,
-  setEndHours,
+  startTimes,
+  setStartTimes,
+  endTimes,
+  setEndTimes,
   slotTypes,
   setSlotTypes,
 }) {
@@ -75,21 +71,15 @@ export default function Slots({
   }
 
   function handleChangeStartTime(val: Dayjs, index: number) {
-    const tempHours = startHours;
-    tempHours[index] = val.get("hours");
-    setStartHours(tempHours);
-    const tempMinutes = startMinutes;
-    tempMinutes[index] = val.get("minutes");
-    setStartMinutes(tempMinutes);
+    const tempStarts = startTimes;
+    tempStarts[index] = val;
+    setStartTimes(tempStarts);
   }
 
   function handleChangeEndTime(val: Dayjs, index: number) {
-    const tempHours = endHours;
-    tempHours[index] = val.get("hours");
-    setEndHours(tempHours);
-    const tempMinutes = endMinutes;
-    tempMinutes[index] = val.get("minutes");
-    setEndMinutes(tempMinutes);
+    const tempEnds = endTimes;
+    tempEnds[index] = val;
+    setEndTimes(tempEnds);
   }
 
   function handleNewSlot() {
@@ -106,21 +96,13 @@ export default function Slots({
     tempSlotTypes.unshift(undefined);
     setSlotTypes(tempSlotTypes);
 
-    const tempStartMinutes = startMinutes;
-    tempStartMinutes.unshift(undefined);
-    setStartMinutes(tempStartMinutes);
+    const tempStarts = startTimes;
+    tempStarts.unshift(undefined);
+    setStartTimes(tempStarts);
 
-    const tempStartHours = startHours;
-    tempStartHours.unshift(undefined);
-    setStartHours(tempStartHours);
-
-    const tempEndMinutes = endMinutes;
-    tempEndMinutes.unshift(undefined);
-    setEndMinutes(tempEndMinutes);
-
-    const tempEndHours = endHours;
-    tempEndHours.unshift(undefined);
-    setEndHours(tempEndHours);
+    const tempEnds = endTimes;
+    tempEnds.unshift(undefined);
+    setEndTimes(tempEnds);
 
     const tempConfigs = configs.slice();
     tempConfigs[currentConfig].slots.unshift(tempSlot);
@@ -136,31 +118,16 @@ export default function Slots({
     const tempConfigs = configs;
     tempConfigs[currentConfig].slots.splice(index, 1);
 
-    const tempStartMinutes = startMinutes;
-    tempStartMinutes.splice(index, 1);
-    console.log(tempStartMinutes);
-    tempStartMinutes.push(undefined);
-    setStartMinutes(tempStartMinutes);
+    const tempStarts = startTimes;
+    tempStarts.splice(index, 1);
+    setStartTimes(tempStarts);
 
-    const tempStartHours = startHours;
-    tempStartHours.splice(index, 1);
-    tempStartHours.push(undefined);
-    setStartHours(tempStartHours);
-
-    const tempEndMinutes = startMinutes;
-    tempEndMinutes.splice(index, 1);
-    console.log(tempEndMinutes);
-    tempEndMinutes.push(undefined);
-    setStartMinutes(tempEndMinutes);
-
-    const tempEndHours = startHours;
-    tempEndHours.splice(index, 1);
-    tempEndHours.push(undefined);
-    setStartHours(tempEndHours);
+    const tempEnds = endTimes;
+    tempEnds.splice(index, 1);
+    setEndTimes(tempEnds);
 
     const tempSlotTypes = slotTypes;
     tempSlotTypes.splice(index, 1);
-    tempSlotTypes.push(undefined);
     setSlotTypes(tempSlotTypes);
 
     setConfigs(tempConfigs.slice());
@@ -294,20 +261,8 @@ export default function Slots({
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <MobileTimePicker
                 value={
-                  startMinutes[key] !== undefined
-                    ? startHours[key] !== undefined
-                      ? dayjs(
-                          "2022-04-17T" +
-                            startHours[key] +
-                            ":" +
-                            startMinutes[key],
-                        )
-                      : dayjs(
-                          "2022-04-17T" +
-                            Math.floor(value.startTime / 60) +
-                            ":" +
-                            startMinutes[key],
-                        )
+                  startTimes[key] !== undefined
+                    ? startTimes[key]
                     : dayjs(
                         "2022-04-17T" +
                           Math.floor(value.startTime / 60) +
@@ -323,17 +278,8 @@ export default function Slots({
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <MobileTimePicker
                 value={
-                  endMinutes[key] !== undefined
-                    ? endHours[key] !== undefined
-                      ? dayjs(
-                          "2022-04-17T" + endHours[key] + ":" + endMinutes[key],
-                        )
-                      : dayjs(
-                          "2022-04-17T" +
-                            Math.floor(value.endTime / 60) +
-                            ":" +
-                            endMinutes[key],
-                        )
+                  endTimes[key] !== undefined
+                    ? endTimes[key]
                     : dayjs(
                         "2022-04-17T" +
                           Math.floor(value.endTime / 60) +

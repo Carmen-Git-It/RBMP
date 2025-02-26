@@ -13,7 +13,7 @@ import {
   TextField,
 } from "@mui/material";
 import { useAtom } from "jotai";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   currentPlaylistConfigIdAtom,
   playlistConfigAtom,
@@ -22,59 +22,58 @@ import writeData from "../../lib/writeData";
 import FilesConfig from "./filesConfig";
 import Slots from "./slots";
 import VideoType from "../../lib/model/videoType";
+import { Dayjs } from "dayjs";
 
 // TODO: Refactor this monstrosity
 
 export default function Config() {
   const [configs, setConfigs] = useAtom(playlistConfigAtom);
-
-  const [startMinutes, setStartMinutes] = useState(new Array(100));
-  const [startHours, setStartHours] = useState(new Array(100)); // TODO: Add and remove array entries manually on config load and slot modification.
-  const [endMinutes, setEndMinutes] = useState(new Array(100));
-  const [endHours, setEndHours] = useState(new Array(100));
-  const [slotTypes, setSlotTypes] = useState(new Array<VideoType>(100));
-
-  console.log("CONFIG RENDERER + " + configs);
   const [currentConfig, setCurrentConfig] = useAtom(
     currentPlaylistConfigIdAtom,
   );
-
+  const [startTimes, setStartTimes] = useState(new Array<Dayjs>());
+  const [endTimes, setEndTimes] = useState(new Array<Dayjs>());
+  const [slotTypes, setSlotTypes] = useState(new Array<VideoType>(100));
   const [name, setName] = useState(configs[currentConfig].name);
   const [description, setDescription] = useState(
     configs[currentConfig].description,
   );
 
+  useEffect(() => {
+    if (startTimes.length === 0) {
+      const tempArr = new Array<Dayjs>(configs[currentConfig].slots.length);
+      setStartTimes(tempArr);
+    }
+    if (endTimes.length === 0) {
+      const tempArr = new Array<Dayjs>(configs[currentConfig].slots.length);
+      setEndTimes(tempArr);
+    }
+  }, []);
+
+  function setSlotTimeArrLength() {
+    const tempStarts = new Array<Dayjs>(configs[currentConfig].slots.length);
+    setStartTimes(tempStarts);
+    const tempEnds = new Array<Dayjs>(configs[currentConfig].slots.length);
+    setEndTimes(tempEnds);
+  }
+
   function handleChangeCurrentConfig(e: SelectChangeEvent) {
     setCurrentConfig(Number.parseInt(e.target.value));
+    setSlotTimeArrLength();
   }
 
   function handleSaveConfig() {
     const tempConfigs = configs.slice();
     for (let i = 0; i < tempConfigs[currentConfig].slots.length; i++) {
       // Start time
-      if (startMinutes[i] !== undefined && startHours[i] !== undefined) {
+      if (startTimes[i] !== undefined) {
         tempConfigs[currentConfig].slots[i].startTime =
-          startMinutes[i] + startHours[i] * 60;
-      } else if (startMinutes[i] !== undefined) {
-        tempConfigs[currentConfig].slots[i].startTime =
-          (tempConfigs[currentConfig].slots[i].startTime % 60) +
-          startMinutes[i];
-      } else if (startHours[i] !== undefined) {
-        tempConfigs[currentConfig].slots[i].startTime =
-          Math.floor(tempConfigs[currentConfig].slots[i].startTime / 60) +
-          startHours[i] * 60;
+          startTimes[i].get("minutes") + startTimes[i].get("hours") * 60;
       }
       // End time
-      if (endMinutes[i] !== undefined && endHours[i] !== undefined) {
+      if (endTimes[i] !== undefined) {
         tempConfigs[currentConfig].slots[i].endTime =
-          endMinutes[i] + endHours[i] * 60; // TODO: Deal with unchanged values
-      } else if (endMinutes[i] !== undefined) {
-        tempConfigs[currentConfig].slots[i].endTime =
-          (tempConfigs[currentConfig].slots[i].endTime % 60) + endMinutes[i];
-      } else if (endHours[i] !== undefined) {
-        tempConfigs[currentConfig].slots[i].endTime =
-          Math.floor(tempConfigs[currentConfig].slots[i].endTime / 60) +
-          endHours[i] * 60;
+          endTimes[i].get("minutes") + endTimes[i].get("hours") * 60;
       }
       // Type
       if (slotTypes[i] !== undefined) {
@@ -155,14 +154,10 @@ export default function Config() {
                   />
                   <Paper elevation={6}>
                     <Slots
-                      startMinutes={startMinutes}
-                      setStartMinutes={setStartMinutes}
-                      startHours={startHours}
-                      setStartHours={setStartHours}
-                      endMinutes={endMinutes}
-                      setEndMinutes={setEndMinutes}
-                      endHours={endHours}
-                      setEndHours={setEndHours}
+                      startTimes={startTimes}
+                      setStartTimes={setStartTimes}
+                      endTimes={endTimes}
+                      setEndTimes={setEndTimes}
                       slotTypes={slotTypes}
                       setSlotTypes={setSlotTypes}
                     />
