@@ -100,11 +100,15 @@ export default function Player() {
   // Track the video to the correct time
   useEffect(() => {
     if (!isReady) {
+      console.log("Not ready");
       if (player.current) {
         const date = new Date();
         const minutes =
           date.getMinutes() + date.getHours() * 60 + date.getSeconds() / 60;
-        player?.current?.seekTo((minutes - currentFile.timeStart) * 60);
+        if ((minutes - currentFile.timeStart) * 60 > 10) {
+          console.log("seeking to: " + (minutes - currentFile.timeStart) * 60);
+          player?.current?.seekTo((minutes - currentFile.timeStart) * 60);
+        }
       }
     }
     setIsReady(true);
@@ -127,6 +131,7 @@ export default function Player() {
     if (video) {
       setContent("file://" + video.file.filePath);
       setContentTitle(video.file.fileName + "");
+      setCurrentFile(video);
       setIsReady(false);
     } else {
       setContent("");
