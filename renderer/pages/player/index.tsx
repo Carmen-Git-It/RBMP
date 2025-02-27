@@ -33,6 +33,7 @@ export default function Player() {
   const [intervalTick, setIntervalTick] = useState(false);
   const player = useRef<ReactPlayer>();
   const [isReady, setIsReady] = useState(true);
+  const [paused, setPaused] = useState(false);
   const [currentFile, setCurrentFile] = useState<PlaylistFile>();
 
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -78,6 +79,7 @@ export default function Player() {
     }
   }, [intervalTick]);
 
+  // Seek on window change if focus changes back
   useEffect(() => {
     if (hasWindow && playlist !== undefined && currentFile !== undefined) {
       setIsReady(false);
@@ -181,6 +183,17 @@ export default function Player() {
     setSnackbarOpen(false);
   }
 
+  function handleResume() {
+    if (paused) {
+      setIsReady(false);
+      setPaused(false);
+    }
+  }
+
+  function handlePause() {
+    setPaused(true);
+  }
+
   const wrapper_style: CSSProperties = {
     position: "relative",
     paddingTop: "30%",
@@ -199,6 +212,8 @@ export default function Player() {
               player_style={player_style}
               play={play}
               handleContentEnd={handleContentEnd}
+              onResume={handleResume}
+              onPause={handlePause}
             />
           )}
         </Grid>

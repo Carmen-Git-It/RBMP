@@ -8,6 +8,8 @@ export default function Player({
   player_style,
   play,
   handleContentEnd,
+  onResume,
+  onPause,
 }) {
   return (
     <ReactPlayer
@@ -21,6 +23,8 @@ export default function Player({
       playing={play}
       onEnded={handleContentEnd}
       controls={true}
+      onPlay={onResume}
+      onPause={onPause}
     />
   );
 }
