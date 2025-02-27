@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import { MobileTimePicker } from "@mui/x-date-pickers/MobileTimePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAtom, useAtomValue } from "jotai";
 
 import VideoType from "../../lib/model/videoType";
@@ -37,17 +37,20 @@ export default function Slots({
   setEndTimes,
   slotTypes,
   setSlotTypes,
+  currentConfig,
 }) {
   const [types, setTypes] = useAtom(typesAtom);
   const [configs, setConfigs] = useAtom(playlistConfigAtom);
-  const currentConfig = useAtomValue(currentPlaylistConfigIdAtom);
+  const currentConfigIndex = useAtomValue(currentPlaylistConfigIdAtom);
 
   const [typeModalOpen, setTypeModalOpen] = useState(false);
   const [newTypeName, setNewTypeName] = useState("");
   const [newTypeSlot, setNewTypeSlot] = useState(0);
-  const [currentSlots, setCurrentSlots] = useState(
-    configs[currentConfig].slots.slice(),
-  );
+  const [currentSlots, setCurrentSlots] = useState(currentConfig.slots.slice());
+
+  useEffect(() => {
+    setCurrentSlots(currentConfig.slots.slice());
+  }, [currentConfig]);
 
   function handleOpenTypeModal(index) {
     setNewTypeSlot(index);
@@ -105,7 +108,7 @@ export default function Slots({
     setEndTimes(tempEnds);
 
     const tempConfigs = configs.slice();
-    tempConfigs[currentConfig].slots.unshift(tempSlot);
+    tempConfigs[currentConfigIndex].slots.unshift(tempSlot);
     setConfigs(tempConfigs);
 
     const tempSlots = currentSlots.slice();
@@ -116,7 +119,7 @@ export default function Slots({
   function handleDeleteSlot(index: number) {
     console.log("Deleting slot: " + index);
     const tempConfigs = configs;
-    tempConfigs[currentConfig].slots.splice(index, 1);
+    tempConfigs[currentConfigIndex].slots.splice(index, 1);
 
     const tempStarts = startTimes;
     tempStarts.splice(index, 1);
@@ -131,7 +134,7 @@ export default function Slots({
     setSlotTypes(tempSlotTypes);
 
     setConfigs(tempConfigs.slice());
-    setCurrentSlots(tempConfigs[currentConfig].slots.slice());
+    setCurrentSlots(tempConfigs[currentConfigIndex].slots.slice());
   }
 
   // Save new type and set slot type to new type
@@ -145,7 +148,8 @@ export default function Slots({
     setTypes(tempTypes);
     writeData("types.conf", tempTypes);
 
-    configs[currentConfig].slots[newTypeSlot].type = types[types.length - 1];
+    configs[currentConfigIndex].slots[newTypeSlot].type =
+      types[types.length - 1];
     slotTypes[newTypeSlot] = tempType;
 
     setTypeModalOpen(false);

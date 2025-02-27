@@ -12,78 +12,118 @@ import {
   Button,
   TextField,
 } from "@mui/material";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import React, { useEffect, useState } from "react";
 import {
   currentPlaylistConfigIdAtom,
   playlistConfigAtom,
+  typesAtom,
 } from "../../store/store";
 import writeData from "../../lib/writeData";
 import FilesConfig from "./filesConfig";
 import Slots from "./slots";
 import VideoType from "../../lib/model/videoType";
 import { Dayjs } from "dayjs";
+import PlaylistConfig from "../../lib/model/playlistConfig";
+import PlaylistConfigSlot from "../../lib/model/playlistConfigSlot";
 
 // TODO: Refactor this monstrosity
 
 export default function Config() {
+  const types = useAtomValue(typesAtom);
   const [configs, setConfigs] = useAtom(playlistConfigAtom);
-  const [currentConfig, setCurrentConfig] = useAtom(
+  const [currentConfigIndex, setCurrentConfigIndex] = useAtom(
     currentPlaylistConfigIdAtom,
+  );
+  const [currentConfig, setCurrentConfig] = useState(
+    configs[currentConfigIndex],
   );
   const [startTimes, setStartTimes] = useState(new Array<Dayjs>());
   const [endTimes, setEndTimes] = useState(new Array<Dayjs>());
   const [slotTypes, setSlotTypes] = useState(new Array<VideoType>(100));
-  const [name, setName] = useState(configs[currentConfig].name);
+  const [name, setName] = useState(configs[currentConfigIndex].name);
+  const [newConfig, setNewConfig] = useState(false);
   const [description, setDescription] = useState(
-    configs[currentConfig].description,
+    configs[currentConfigIndex].description,
   );
 
   useEffect(() => {
     if (startTimes.length === 0) {
-      const tempArr = new Array<Dayjs>(configs[currentConfig].slots.length);
+      const tempArr = new Array<Dayjs>(
+        configs[currentConfigIndex].slots.length,
+      );
       setStartTimes(tempArr);
     }
     if (endTimes.length === 0) {
-      const tempArr = new Array<Dayjs>(configs[currentConfig].slots.length);
+      const tempArr = new Array<Dayjs>(
+        configs[currentConfigIndex].slots.length,
+      );
       setEndTimes(tempArr);
     }
   }, []);
 
+  useEffect(() => {
+    if (newConfig) {
+      console.log("New config.");
+      setCurrentConfigIndex(configs.length - 1);
+      setCurrentConfig(configs[configs.length - 1]);
+      setName(configs[configs.length - 1].name);
+      setDescription(configs[configs.length - 1].description);
+      setNewConfig(false);
+    }
+  }, [configs]);
+
+  useEffect(() => {
+    if (currentConfig) {
+      setSlotTimeArrLength();
+      setSlotTypes(new Array<VideoType>(100));
+    }
+  }, [currentConfig]);
+
   function setSlotTimeArrLength() {
-    const tempStarts = new Array<Dayjs>(configs[currentConfig].slots.length);
+    const tempStarts = new Array<Dayjs>(
+      configs[currentConfigIndex].slots.length,
+    );
     setStartTimes(tempStarts);
-    const tempEnds = new Array<Dayjs>(configs[currentConfig].slots.length);
+    const tempEnds = new Array<Dayjs>(configs[currentConfigIndex].slots.length);
     setEndTimes(tempEnds);
   }
 
   function handleChangeCurrentConfig(e: SelectChangeEvent) {
-    setCurrentConfig(Number.parseInt(e.target.value));
+    const index = Number.parseInt(e.target.value);
+    setCurrentConfigIndex(index);
+
+    setName(configs[index].name);
+    setDescription(configs[index].description);
+
+    setCurrentConfig(configs[index]);
+
     setSlotTimeArrLength();
   }
 
   function handleSaveConfig() {
     const tempConfigs = configs.slice();
-    for (let i = 0; i < tempConfigs[currentConfig].slots.length; i++) {
+    for (let i = 0; i < tempConfigs[currentConfigIndex].slots.length; i++) {
       // Start time
       if (startTimes[i] !== undefined) {
-        tempConfigs[currentConfig].slots[i].startTime =
+        tempConfigs[currentConfigIndex].slots[i].startTime =
           startTimes[i].get("minutes") + startTimes[i].get("hours") * 60;
       }
       // End time
       if (endTimes[i] !== undefined) {
-        tempConfigs[currentConfig].slots[i].endTime =
+        tempConfigs[currentConfigIndex].slots[i].endTime =
           endTimes[i].get("minutes") + endTimes[i].get("hours") * 60;
       }
       // Type
       if (slotTypes[i] !== undefined) {
-        tempConfigs[currentConfig].slots[i].type = slotTypes[i];
+        tempConfigs[currentConfigIndex].slots[i].type = slotTypes[i];
       }
     }
 
-    tempConfigs[currentConfig].name = name;
-    tempConfigs[currentConfig].description = description;
+    tempConfigs[currentConfigIndex].name = name;
+    tempConfigs[currentConfigIndex].description = description;
     setConfigs(tempConfigs);
+    setCurrentConfig(tempConfigs[currentConfigIndex]);
     writeData("configs.conf", tempConfigs);
   }
 
@@ -93,6 +133,28 @@ export default function Config() {
 
   function handleChangeDescription(e) {
     setDescription(e.target.value);
+  }
+
+  function handleCreateConfig() {
+    const tempConfig = new PlaylistConfig();
+    tempConfig.generateUUID();
+    tempConfig.name = "New Playlist";
+    tempConfig.description = "...";
+    tempConfig.slots = new Array();
+    const tempSlot = new PlaylistConfigSlot();
+    tempSlot.generateUUID();
+    tempSlot.endTime = 1439;
+    tempSlot.startTime = 0;
+    tempSlot.muted = false;
+    tempSlot.volume = 100;
+    tempSlot.type = types[1];
+    tempConfig.slots.push(tempSlot);
+
+    const tempConfigs = configs.slice();
+    tempConfigs.push(tempConfig);
+    setConfigs(tempConfigs);
+
+    setNewConfig(true);
   }
 
   return (
@@ -107,24 +169,34 @@ export default function Config() {
             sx={{ padding: 2, maxHeight: 550, overflow: "auto" }}
           >
             <Stack spacing={2}>
-              <FormControl fullWidth>
-                <InputLabel id="current-config-select-label">
-                  Current Configuration
-                </InputLabel>
-                <Select
-                  labelId="current-config-select-label"
-                  id="current-config-select"
-                  value={currentConfig.toLocaleString()}
-                  label="Current Configuration"
-                  onChange={handleChangeCurrentConfig}
+              <Stack spacing={1} direction="row">
+                <FormControl fullWidth>
+                  <InputLabel id="current-config-select-label">
+                    Current Configuration
+                  </InputLabel>
+                  <Select
+                    labelId="current-config-select-label"
+                    id="current-config-select"
+                    value={currentConfigIndex.toLocaleString()}
+                    label="Current Configuration"
+                    onChange={handleChangeCurrentConfig}
+                  >
+                    {configs.map((config, key) => (
+                      <MenuItem key={key} value={key}>
+                        {config.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <Button
+                  variant="outlined"
+                  color="success"
+                  onClick={handleCreateConfig}
                 >
-                  {configs.map((config, key) => (
-                    <MenuItem key={key} value={key}>
-                      {config.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+                  Create Config
+                </Button>
+              </Stack>
+
               <Box
                 sx={{
                   borderBottom: 1,
@@ -139,7 +211,7 @@ export default function Config() {
                     id="config-name"
                     label="Name"
                     variant="outlined"
-                    defaultValue={configs[currentConfig].name}
+                    value={name !== undefined ? name : currentConfig.name}
                     onChange={handleChangeName}
                     error={name === ""}
                     helperText={name === "" ? "Name must not be empty" : ""}
@@ -148,7 +220,11 @@ export default function Config() {
                     id="config-description"
                     label="Description"
                     variant="outlined"
-                    defaultValue={configs[currentConfig].description}
+                    value={
+                      description !== undefined
+                        ? description
+                        : currentConfig.description
+                    }
                     multiline
                     onChange={handleChangeDescription}
                   />
@@ -160,6 +236,7 @@ export default function Config() {
                       setEndTimes={setEndTimes}
                       slotTypes={slotTypes}
                       setSlotTypes={setSlotTypes}
+                      currentConfig={currentConfig}
                     />
                   </Paper>
                   <Button
