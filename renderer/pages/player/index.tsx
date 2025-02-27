@@ -1,6 +1,3 @@
-//TODO: Remove when implemented
-/* eslint no-unused-vars: 0 */
-
 import React, { CSSProperties, useState, useEffect, useRef } from "react";
 
 import {
@@ -23,21 +20,19 @@ import {
 import PlaylistFile from "../../lib/model/playlistFile";
 import PlaylistSlot from "../../lib/model/playlistSlot";
 import generatePlaylist from "../../lib/generatePlaylist";
-import VPlayer from "../config/player";
+import VPlayer from "./player";
+import writeData from "../../lib/writeData";
+import dayjs from "dayjs";
 
 export default function Player() {
   const [fullScreen, setFullScreen] = useState(false);
   const [muted, setMuted] = useState(false);
   const [play, setPlay] = useState(true);
-  const [updatePlaylist, setUpdatePlaylist] = useState(true);
-  const [day, setDay] = useState(new Date().getDate());
   const [content, setContent] = useState("");
   const [contentTitle, setContentTitle] = useState("");
-  const [currentMinute, setCurrentMinute] = useState(
-    new Date().getHours() * 60 + new Date().getMinutes(),
-  );
+  const [intervalTick, setIntervalTick] = useState(false);
   const player = useRef<ReactPlayer>();
-  const [isReady, setIsReady] = useState(false);
+  const [isReady, setIsReady] = useState(true);
   const [currentFile, setCurrentFile] = useState<PlaylistFile>();
 
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -59,12 +54,35 @@ export default function Player() {
     if (typeof window !== "undefined") {
       setHasWindow(true);
     }
-    // SetInterval this for the purposes of generating a new playlist when the day rolls over
-    // const min = new Date().getHours() * 60 + new Date().getMinutes();
-    // if (min !== currentMinute) {
-    //   setCurrentMinute(min);
-    // }
+
+    if (hasWindow && (!playlist || playlist == undefined)) {
+      handleMakePlaylist();
+    }
+
+    return () => setHasWindow(false);
   }, []);
+
+  // Once per minute, check to see if the day has changed over yet.
+  // If it has, generate a new playlist.
+  useEffect(() => {
+    if (hasWindow) {
+      const interval = setInterval(() => {
+        setIntervalTick(!intervalTick);
+      }, 60000);
+
+      if (playlist !== undefined && dayjs().date() !== playlist.date.date()) {
+        handleMakePlaylist();
+      }
+
+      return () => clearInterval(interval);
+    }
+  }, [intervalTick]);
+
+  useEffect(() => {
+    if (hasWindow && playlist !== undefined && currentFile !== undefined) {
+      setIsReady(false);
+    }
+  }, [hasWindow]);
 
   useEffect(() => {
     console.log("PLAYLIST RE-RENDER");
@@ -95,11 +113,11 @@ export default function Player() {
       setContent("");
       setContentTitle("No playlist set");
     }
-  }, [playlist, currentMinute]);
+  }, [playlist]);
 
   // Track the video to the correct time
   useEffect(() => {
-    if (!isReady) {
+    if (!isReady && hasWindow) {
       console.log("Not ready");
       if (player.current) {
         const date = new Date();
@@ -151,6 +169,7 @@ export default function Player() {
     generatePlaylist(configs[currentConfig], files).then((p) => {
       if (p) {
         setPlaylist(p);
+        writeData("playlist.conf", p);
       } else {
         setSnackbarMessage("Error: Problem generating snackbar");
         setSnackbarOpen(true);

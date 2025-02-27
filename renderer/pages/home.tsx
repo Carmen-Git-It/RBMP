@@ -7,7 +7,12 @@ import { useState, useEffect } from "react";
 import Config from "./config";
 import { useSetAtom } from "jotai";
 
-import { filesAtom, playlistPlayerAtom, typesAtom } from "../store/store";
+import {
+  currentPlaylistConfigIdAtom,
+  filesAtom,
+  playlistPlayerAtom,
+  typesAtom,
+} from "../store/store";
 import { playlistConfigAtom } from "../store/store";
 import VideoFile from "../lib/model/videoFile";
 import PlaylistFile from "../lib/model/playlistFile";
@@ -19,6 +24,7 @@ import writeData from "../lib/writeData";
 import loadTypes from "../lib/loadTypes";
 import loadFiles from "../lib/loadFiles";
 import loadPlaylist from "../lib/loadPlaylist";
+import dayjs from "dayjs";
 
 const Root = styled("div")(() => {
   return {
@@ -34,6 +40,7 @@ export default function HomePage() {
   const setConfigs = useSetAtom(playlistConfigAtom);
   const setFiles = useSetAtom(filesAtom);
   const setTypes = useSetAtom(typesAtom);
+  const setCurrentConfig = useSetAtom(currentPlaylistConfigIdAtom);
 
   function setup() {
     console.log("Setting Atoms!!");
@@ -204,8 +211,10 @@ export default function HomePage() {
           }
           const configs = setupResults.configs;
           writeData("configs.conf", configs);
+          setCurrentConfig(0);
         } else {
           setConfigs(conf);
+          setCurrentConfig(0);
         }
       });
 
@@ -237,10 +246,18 @@ export default function HomePage() {
 
       loadPlaylist().then((p) => {
         if (p) {
-          setPlaylist(p);
+          const today = dayjs();
+          console.log("Today: " + today.date() + " Playlist: " + p.date.date());
+          if (
+            p &&
+            p.date.year() === today.year() &&
+            p.date.month() === today.month() &&
+            p.date.date() === today.date()
+          ) {
+            setPlaylist(p);
+          }
         }
       });
-
       setRunOnce(true);
     }
 
