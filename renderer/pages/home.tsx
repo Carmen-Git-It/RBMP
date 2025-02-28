@@ -269,7 +269,7 @@ export default function HomePage() {
   return (
     <React.Fragment>
       <Head>
-        <title>RBMS</title>
+        <title>RBMP</title>
       </Head>
       <Root>
         <Paper elevation={6}>
