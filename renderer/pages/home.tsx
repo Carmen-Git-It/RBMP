@@ -274,7 +274,7 @@ export default function HomePage() {
       <Root>
         <Paper elevation={6}>
           <Box
-            sx={{ borderBottom: 1, borderColor: "divider", marginBottom: 3 }}
+            sx={{ borderBottom: 1, borderColor: "divider", marginBottom: 1 }}
           >
             <Tabs value={currentTab} onChange={handleTabChange} centered>
               <Tab label="Player" />

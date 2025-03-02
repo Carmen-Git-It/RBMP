@@ -8,7 +8,6 @@ import {
   Typography,
   Snackbar,
 } from "@mui/material";
-import screenfull from "screenfull";
 import ReactPlayer from "react-player";
 import { useAtom, useAtomValue } from "jotai";
 import {
@@ -23,17 +22,17 @@ import generatePlaylist from "../../lib/generatePlaylist";
 import VPlayer from "./player";
 import writeData from "../../lib/writeData";
 import dayjs from "dayjs";
+import PlaylistView from "./playlist";
 
 export default function Player() {
-  const [fullScreen, setFullScreen] = useState(false);
-  const [muted, setMuted] = useState(false);
-  const [play, setPlay] = useState(true);
+  const [playing, setPlaying] = useState(true);
   const [content, setContent] = useState("");
   const [contentTitle, setContentTitle] = useState("");
   const [intervalTick, setIntervalTick] = useState(false);
   const player = useRef<ReactPlayer>();
   const [isReady, setIsReady] = useState(true);
   const [paused, setPaused] = useState(false);
+  const [height, setHeight] = useState(0);
   const [currentFile, setCurrentFile] = useState<PlaylistFile>();
 
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -44,15 +43,13 @@ export default function Player() {
   const currentConfig = useAtomValue(currentPlaylistConfigIdAtom); // This is really just the index in the current array of configs, not the id, TODO: Change this
   const files = useAtomValue(filesAtom);
 
-  function handleFullScreenChange() {
-    setFullScreen(!fullScreen);
-    screenfull.request(document.querySelector(".react-player"));
-  }
-
   const [hasWindow, setHasWindow] = useState(false);
   useEffect(() => {
     console.log("WINDOW RE-RENDER");
     if (typeof window !== "undefined") {
+      window.addEventListener("resize", () => {
+        setHeight(window.innerHeight - 50);
+      });
       setHasWindow(true);
     }
 
@@ -60,7 +57,14 @@ export default function Player() {
       handleMakePlaylist();
     }
 
-    return () => setHasWindow(false);
+    setPlaying(true);
+
+    return () => {
+      setHasWindow(false);
+      window.removeEventListener("resize", () => {
+        setHeight(window.innerHeight - 50);
+      });
+    };
   }, []);
 
   // Once per minute, check to see if the day has changed over yet.
@@ -98,15 +102,19 @@ export default function Player() {
         return item.startTime < minutes && item.endTime > minutes;
       })[0];
 
-      const video = slots.files.filter((item: PlaylistFile) => {
-        return item.timeStart < minutes && item.timeEnd > minutes;
-      })[0];
-
-      if (video) {
-        setContent("file://" + video.file.filePath);
-        setContentTitle(video.file.fileName + "");
-        setCurrentFile(video);
-        setIsReady(false);
+      if (slots.files) {
+        const video = slots.files.filter((item: PlaylistFile) => {
+          return item.timeStart < minutes && item.timeEnd > minutes;
+        })[0];
+        if (video) {
+          setContent("file://" + video.file.filePath);
+          setContentTitle(video.file.fileName + "");
+          setCurrentFile(video);
+          setIsReady(false);
+        } else {
+          setContent("");
+          setContentTitle("No video set to play at this time.");
+        }
       } else {
         setContent("");
         setContentTitle("No video set to play at this time.");
@@ -159,14 +167,6 @@ export default function Player() {
     }
   }
 
-  function handleMute() {
-    setMuted(!muted);
-  }
-
-  function handlePlay() {
-    setPlay(!play);
-  }
-
   function handleMakePlaylist() {
     generatePlaylist(configs[currentConfig], files).then((p) => {
       if (p) {
@@ -202,51 +202,46 @@ export default function Player() {
 
   return (
     <React.Fragment>
-      <Grid container spacing={0}>
-        <Grid item sm={6} md={6} style={wrapper_style}>
-          {hasWindow && (
-            <VPlayer
-              player={player}
-              content={content}
-              muted={muted}
-              player_style={player_style}
-              play={play}
-              handleContentEnd={handleContentEnd}
-              onResume={handleResume}
-              onPause={handlePause}
-            />
-          )}
+      {hasWindow && (
+        <Grid container spacing={0} sx={{ height: height }}>
+          <Grid item xs={12} md={6} style={wrapper_style}>
+            {hasWindow && (
+              <VPlayer
+                player={player}
+                content={content}
+                muted={currentFile ? currentFile.muted : false}
+                player_style={player_style}
+                handleContentEnd={handleContentEnd}
+                onResume={handleResume}
+                onPause={handlePause}
+                play={playing}
+              />
+            )}
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Paper elevation={3}>
+              <Stack
+                spacing={2}
+                sx={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: height,
+                }}
+              >
+                <Typography variant="h5">
+                  {contentTitle.length > 0
+                    ? contentTitle
+                    : "No video set to play at this time."}
+                </Typography>
+                <Button variant="outlined" onClick={handleMakePlaylist}>
+                  Generate New Playlist
+                </Button>
+                <PlaylistView></PlaylistView>
+              </Stack>
+            </Paper>
+          </Grid>
         </Grid>
-        <Grid item sm={6} md={6}>
-          <Paper elevation={3}>
-            <Stack
-              spacing={2}
-              sx={{
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <Typography variant="h5">
-                {contentTitle.length > 0
-                  ? contentTitle
-                  : "No video set to play at this time."}
-              </Typography>
-              <Button variant="outlined" onClick={handleMakePlaylist}>
-                Generate New Playlist
-              </Button>
-              <Button variant="contained" onClick={handlePlay}>
-                {play ? "Pause" : "Play"}
-              </Button>
-              <Button variant="contained" onClick={handleFullScreenChange}>
-                FullScreen
-              </Button>
-              <Button variant="contained" onClick={handleMute}>
-                {muted ? "Unmute" : "Mute"}
-              </Button>
-            </Stack>
-          </Paper>
-        </Grid>
-      </Grid>
+      )}
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={5000}

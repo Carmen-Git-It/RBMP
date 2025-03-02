@@ -6,10 +6,10 @@ export default function Player({
   content,
   muted,
   player_style,
-  play,
   handleContentEnd,
   onResume,
   onPause,
+  play,
 }) {
   return (
     <ReactPlayer
@@ -20,11 +20,11 @@ export default function Player({
       height="100%"
       muted={muted}
       style={player_style}
-      playing={play}
       onEnded={handleContentEnd}
       controls={true}
       onPlay={onResume}
       onPause={onPause}
+      playing={play}
     />
   );
 }

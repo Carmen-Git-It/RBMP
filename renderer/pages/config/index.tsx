@@ -27,8 +27,6 @@ import { Dayjs } from "dayjs";
 import PlaylistConfig from "../../lib/model/playlistConfig";
 import PlaylistConfigSlot from "../../lib/model/playlistConfigSlot";
 
-// TODO: Refactor this monstrosity
-
 export default function Config() {
   const types = useAtomValue(typesAtom);
   const [configs, setConfigs] = useAtom(playlistConfigAtom);
