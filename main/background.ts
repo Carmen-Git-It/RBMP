@@ -125,7 +125,7 @@ const selectMediaFile = async (window) => {
 
   const win = createWindow("main", {
     width: 1280,
-    height: 760,
+    height: 800,
     webPreferences: {
       nodeIntegration: true,
       webSecurity: false,

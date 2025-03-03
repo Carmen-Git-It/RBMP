@@ -1,9 +1,9 @@
 {
   "private": true,
-  "name": "my-nextron-app",
-  "description": "My application description",
+  "name": "RBMP",
+  "description": "Scheduled media player that aims to emulate 24/7 broadcast television with maximum customization and using your own media files. Programming set up by you for you.",
   "version": "1.0.0",
-  "author": "Yoshihide Shiono <shiono.yoshihide@gmail.com>",
+  "author": "Carmen Whitton <carmenwhitton@gmail.com>",
   "main": "app/background.js",
   "scripts": {
     "dev": "nextron",

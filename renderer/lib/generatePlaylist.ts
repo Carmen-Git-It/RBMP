@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import Playlist from "./model/playlist";
 import PlaylistConfig from "./model/playlistConfig";
 import PlaylistFile from "./model/playlistFile";
@@ -13,6 +14,7 @@ export default async function generatePlaylist(
   const generatedPlaylist = new Playlist();
   generatedPlaylist.generateUUID();
   generatedPlaylist.name = "Generated Playlist";
+  generatedPlaylist.date = dayjs();
   generatedPlaylist.slots = new Array();
 
   for (const slot of config.slots) {

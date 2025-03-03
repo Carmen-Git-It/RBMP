@@ -7,8 +7,6 @@ export default class PlaylistConfig implements Serializable<PlaylistConfig> {
 
   name: String;
   description: String;
-  start_time: number;
-  end_time: number;
   slots: PlaylistConfigSlot[];
 
   generateUUID() {
@@ -19,8 +17,6 @@ export default class PlaylistConfig implements Serializable<PlaylistConfig> {
     this.id = input.id;
     this.name = input.name;
     this.description = input.description;
-    this.start_time = input.start_time;
-    this.end_time = input.end_time;
     this.slots = new Array();
     for (const slot of input.slots) {
       this.slots.push(new PlaylistConfigSlot().deserialize(slot));

@@ -18,6 +18,7 @@ export default class PlaylistSlot implements Serializable<PlaylistSlot> {
     this.id = input.id;
     this.startTime = input.startTime;
     this.endTime = input.endTime;
+    this.files = new Array();
 
     for (const f of input.files) {
       this.files.push(new PlaylistFile().deserialize(f));
