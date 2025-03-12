@@ -13,6 +13,7 @@ import { useAtom, useAtomValue } from "jotai";
 import {
   currentPlaylistConfigIdAtom,
   filesAtom,
+  fillerAtom,
   playlistConfigAtom,
   playlistPlayerAtom,
 } from "../../store/store";
@@ -38,6 +39,7 @@ export default function Player() {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
+  const fillerType = useAtomValue(fillerAtom);
   const [playlist, setPlaylist] = useAtom(playlistPlayerAtom);
   const configs = useAtomValue(playlistConfigAtom);
   const currentConfig = useAtomValue(currentPlaylistConfigIdAtom); // This is really just the index in the current array of configs, not the id, TODO: Change this
@@ -46,7 +48,9 @@ export default function Player() {
   const [hasWindow, setHasWindow] = useState(false);
   useEffect(() => {
     console.log("WINDOW RE-RENDER");
+    console.log("HEIGHT: " + height);
     if (typeof window !== "undefined") {
+      setHeight(window.innerHeight - 50);
       window.addEventListener("resize", () => {
         setHeight(window.innerHeight - 50);
       });
@@ -102,7 +106,11 @@ export default function Player() {
         return item.startTime < minutes && item.endTime > minutes;
       })[0];
 
-      if (slots.files) {
+      if (
+        slots !== undefined &&
+        slots.files !== undefined &&
+        slots.files.length > 0
+      ) {
         const video = slots.files.filter((item: PlaylistFile) => {
           return item.timeStart < minutes && item.timeEnd > minutes;
         })[0];
@@ -168,12 +176,12 @@ export default function Player() {
   }
 
   function handleMakePlaylist() {
-    generatePlaylist(configs[currentConfig], files).then((p) => {
+    generatePlaylist(configs[currentConfig], files, fillerType).then((p) => {
       if (p) {
         setPlaylist(p);
         writeData("playlist.conf", p);
       } else {
-        setSnackbarMessage("Error: Problem generating snackbar");
+        setSnackbarMessage("Error: Problem generating playlist");
         setSnackbarOpen(true);
       }
     });
@@ -236,7 +244,11 @@ export default function Player() {
                 <Button variant="outlined" onClick={handleMakePlaylist}>
                   Generate New Playlist
                 </Button>
-                <PlaylistView></PlaylistView>
+                <PlaylistView
+                  playlistSlots={
+                    playlist !== undefined ? playlist.slots.slice() : undefined
+                  }
+                ></PlaylistView>
               </Stack>
             </Paper>
           </Grid>

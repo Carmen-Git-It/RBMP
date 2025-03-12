@@ -26,6 +26,10 @@ import VideoType from "../../lib/model/videoType";
 import { Dayjs } from "dayjs";
 import PlaylistConfig from "../../lib/model/playlistConfig";
 import PlaylistConfigSlot from "../../lib/model/playlistConfigSlot";
+import FillerContentType from "./fillerContentType";
+
+// TODO: Filler type
+// TODO: MaxHeight based on window height for better fullscreen
 
 export default function Config() {
   const types = useAtomValue(typesAtom);
@@ -38,7 +42,8 @@ export default function Config() {
   );
   const [startTimes, setStartTimes] = useState(new Array<Dayjs>());
   const [endTimes, setEndTimes] = useState(new Array<Dayjs>());
-  const [slotTypes, setSlotTypes] = useState(new Array<VideoType>(100));
+  const [featured, setFeatured] = useState(new Array<boolean>());
+  const [slotTypes, setSlotTypes] = useState(new Array<VideoType>());
   const [name, setName] = useState(configs[currentConfigIndex].name);
   const [newConfig, setNewConfig] = useState(false);
   const [description, setDescription] = useState(
@@ -58,6 +63,18 @@ export default function Config() {
       );
       setEndTimes(tempArr);
     }
+    if (slotTypes.length === 0) {
+      const tempTypes = new Array<VideoType>(
+        configs[currentConfigIndex].slots.length,
+      );
+      setSlotTypes(tempTypes);
+    }
+    if (featured.length === 0) {
+      const tempFeatured = new Array<boolean>(
+        configs[currentConfigIndex].slots.length,
+      );
+      setFeatured(tempFeatured);
+    }
   }, []);
 
   useEffect(() => {
@@ -73,18 +90,25 @@ export default function Config() {
 
   useEffect(() => {
     if (currentConfig) {
-      setSlotTimeArrLength();
-      setSlotTypes(new Array<VideoType>(100));
+      setSlotArrLength();
     }
   }, [currentConfig]);
 
-  function setSlotTimeArrLength() {
+  function setSlotArrLength() {
     const tempStarts = new Array<Dayjs>(
       configs[currentConfigIndex].slots.length,
     );
     setStartTimes(tempStarts);
     const tempEnds = new Array<Dayjs>(configs[currentConfigIndex].slots.length);
     setEndTimes(tempEnds);
+    const tempTypes = new Array<VideoType>(
+      configs[currentConfigIndex].slots.length,
+    );
+    setSlotTypes(tempTypes);
+    const tempFeatured = new Array<boolean>(
+      configs[currentConfigIndex].slots.length,
+    );
+    setFeatured(tempFeatured);
   }
 
   function handleChangeCurrentConfig(e: SelectChangeEvent) {
@@ -96,7 +120,7 @@ export default function Config() {
 
     setCurrentConfig(configs[index]);
 
-    setSlotTimeArrLength();
+    setSlotArrLength();
   }
 
   function handleSaveConfig() {
@@ -115,6 +139,10 @@ export default function Config() {
       // Type
       if (slotTypes[i] !== undefined) {
         tempConfigs[currentConfigIndex].slots[i].type = slotTypes[i];
+      }
+      // Featured
+      if (featured[i] !== undefined) {
+        tempConfigs[currentConfigIndex].slots[i].featured = featured[i];
       }
     }
 
@@ -146,6 +174,7 @@ export default function Config() {
     tempSlot.muted = false;
     tempSlot.volume = 100;
     tempSlot.type = types[1];
+    tempSlot.featured = false;
     tempConfig.slots.push(tempSlot);
 
     const tempConfigs = configs.slice();
@@ -235,6 +264,8 @@ export default function Config() {
                       slotTypes={slotTypes}
                       setSlotTypes={setSlotTypes}
                       currentConfig={currentConfig}
+                      featured={featured}
+                      setFeatured={setFeatured}
                     />
                   </Paper>
                   <Button
@@ -251,7 +282,10 @@ export default function Config() {
           </Paper>
         </Grid>
         <Grid item md={6}>
-          <FilesConfig></FilesConfig>
+          <Stack>
+            <FillerContentType />
+            <FilesConfig />
+          </Stack>
         </Grid>
       </Grid>
     </React.Fragment>

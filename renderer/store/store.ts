@@ -11,3 +11,4 @@ export const filesAtom = atom(new Array<VideoFile>()); // Array of all files reg
 export const typesAtom = atom(new Array<VideoType>()); // Array of all file types (user-defined)
 export const currentPlaylistConfigIdAtom = atom(0); // id of of the currently selected playlist config
 export const dirsAtom = atom(new Array<MediaDir>()); // Array of all tracked directories
+export const fillerAtom = atom<VideoType>(); // Current filler Type

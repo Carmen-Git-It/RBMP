@@ -4,7 +4,9 @@ import {
   Card,
   CardContent,
   CardHeader,
+  Checkbox,
   FormControl,
+  FormControlLabel,
   InputLabel,
   MenuItem,
   Modal,
@@ -38,6 +40,8 @@ export default function Slots({
   slotTypes,
   setSlotTypes,
   currentConfig,
+  featured,
+  setFeatured,
 }) {
   const [types, setTypes] = useAtom(typesAtom);
   const [configs, setConfigs] = useAtom(playlistConfigAtom);
@@ -85,6 +89,14 @@ export default function Slots({
     setEndTimes(tempEnds);
   }
 
+  function handleChangeFeatured(val: boolean, index: number) {
+    console.log("FEATURED[i]:  " + featured[index]);
+    console.log("HANDLE CHANGE FEATURED  " + val);
+    const tempFeatured = featured.slice();
+    tempFeatured[index] = val;
+    setFeatured(tempFeatured);
+  }
+
   function handleNewSlot() {
     console.log("Adding new slot");
 
@@ -94,6 +106,11 @@ export default function Slots({
     tempSlot.endTime = 0;
     tempSlot.muted = false;
     tempSlot.type = types[1];
+    tempSlot.featured = false;
+
+    const tempFeatured = featured.slice();
+    tempFeatured.unshift(undefined);
+    setFeatured(tempFeatured);
 
     const tempSlotTypes = slotTypes.slice();
     tempSlotTypes.unshift(undefined);
@@ -120,6 +137,10 @@ export default function Slots({
     console.log("Deleting slot: " + index);
     const tempConfigs = configs;
     tempConfigs[currentConfigIndex].slots.splice(index, 1);
+
+    const tempFeatured = featured;
+    tempFeatured.splice(index, 1);
+    setFeatured(tempFeatured);
 
     const tempStarts = startTimes;
     tempStarts.splice(index, 1);
@@ -222,7 +243,7 @@ export default function Slots({
       >
         New Slot
       </Button>
-      {currentSlots.map((value, key) => (
+      {currentSlots.map((value: PlaylistConfigSlot, key: number) => (
         <Card variant="outlined" key={key} sx={{ marginTop: 1 }}>
           <CardHeader
             title={"Slot " + key}
@@ -237,63 +258,87 @@ export default function Slots({
             }
           />
           <CardContent>
-            <FormControl fullWidth>
-              <InputLabel id={"slot-type-select-label" + key}>
-                Media Type
-              </InputLabel>
-              <Select
-                labelId={"slot-type-select-label" + key}
-                id={"slot-type-select" + key}
-                defaultValue={value.type.id}
-                value={
-                  slotTypes[key] !== undefined
-                    ? slotTypes[key].id
-                    : value.type.id
-                }
-                onChange={handleChangeType}
-                name={key + ""}
-                label="Media Type"
-              >
-                {types.map((type, typeKey) => (
-                  <MenuItem key={typeKey + 4000} value={type.id as any}>
-                    {type.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <Typography>Start Time</Typography>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <MobileTimePicker
-                value={
-                  startTimes[key] !== undefined
-                    ? startTimes[key]
-                    : dayjs(
-                        "2022-04-17T" +
-                          Math.floor(value.startTime / 60) +
-                          ":" +
-                          (value.startTime % 60),
+            <Stack direction="row" spacing={2}>
+              <FormControl fullWidth>
+                <InputLabel id={"slot-type-select-label" + key}>
+                  Media Type
+                </InputLabel>
+                <Select
+                  labelId={"slot-type-select-label" + key}
+                  id={"slot-type-select" + key}
+                  defaultValue={value.type.id}
+                  value={
+                    slotTypes[key] !== undefined
+                      ? slotTypes[key].id
+                      : value.type.id
+                  }
+                  onChange={handleChangeType}
+                  name={key + ""}
+                  label="Media Type"
+                >
+                  {types.map((type, typeKey) => (
+                    <MenuItem key={typeKey + 4000} value={type.id as any}>
+                      {type.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={
+                      featured[key] !== undefined
+                        ? featured[key]
+                        : value.featured
+                    }
+                    onChange={() =>
+                      handleChangeFeatured(
+                        featured[key] !== undefined
+                          ? !featured[key]
+                          : !value.featured,
+                        key,
                       )
+                    }
+                  ></Checkbox>
                 }
-                onChange={(val) => handleChangeStartTime(val, key)}
-              />
-            </LocalizationProvider>
+                label="Featured Content"
+              ></FormControlLabel>
+            </Stack>
+            <Stack direction="row" spacing={2} sx={{ marginTop: 2 }}>
+              <Typography>Start Time</Typography>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <MobileTimePicker
+                  value={
+                    startTimes[key] !== undefined
+                      ? startTimes[key]
+                      : dayjs(
+                          "2022-04-17T" +
+                            Math.floor(value.startTime / 60) +
+                            ":" +
+                            (value.startTime % 60),
+                        )
+                  }
+                  onChange={(val) => handleChangeStartTime(val, key)}
+                />
+              </LocalizationProvider>
 
-            <Typography>End Time</Typography>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <MobileTimePicker
-                value={
-                  endTimes[key] !== undefined
-                    ? endTimes[key]
-                    : dayjs(
-                        "2022-04-17T" +
-                          Math.floor(value.endTime / 60) +
-                          ":" +
-                          (value.endTime % 60),
-                      )
-                }
-                onChange={(val) => handleChangeEndTime(val, key)}
-              />
-            </LocalizationProvider>
+              <Typography>End Time</Typography>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <MobileTimePicker
+                  value={
+                    endTimes[key] !== undefined
+                      ? endTimes[key]
+                      : dayjs(
+                          "2022-04-17T" +
+                            Math.floor(value.endTime / 60) +
+                            ":" +
+                            (value.endTime % 60),
+                        )
+                  }
+                  onChange={(val) => handleChangeEndTime(val, key)}
+                />
+              </LocalizationProvider>
+            </Stack>
           </CardContent>
         </Card>
       ))}
