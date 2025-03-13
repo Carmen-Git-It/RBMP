@@ -73,9 +73,10 @@ export default function Slots({
   }
 
   function handleChangeStartTime(val: Dayjs, index: number) {
-    console.log("HANDLE CHANGE START TIME");
     const tempSlots = currentSlots.slice();
+    const duration = currentSlots[index].endTime - currentSlots[index].startTime;
     tempSlots[index].startTime = val.get("hours") * 60 + val.get("minutes");
+    tempSlots[index].endTime = tempSlots[index].startTime + duration;
     tempSlots.sort((a, b) => a.startTime - b.startTime);
     setCurrentSlots(tempSlots);
   }
@@ -97,14 +98,14 @@ export default function Slots({
 
     const tempSlot = new PlaylistConfigSlot();
     tempSlot.generateUUID();
-    tempSlot.startTime = 0;
-    tempSlot.endTime = 0;
+    tempSlot.startTime = currentSlots[currentSlots.length - 1].endTime + 1;
+    tempSlot.endTime = tempSlot.startTime + 60;
     tempSlot.muted = false;
     tempSlot.type = types[1];
     tempSlot.featured = false;
 
     const tempSlots = currentSlots.slice();
-    tempSlots.unshift(tempSlot);
+    tempSlots.push(tempSlot);
     setCurrentSlots(tempSlots);
   }
 
@@ -193,14 +194,6 @@ export default function Slots({
           </Stack>
         </Box>
       </Modal>
-      <Button
-        variant="outlined"
-        color="success"
-        onClick={handleNewSlot}
-        sx={{ marginTop: 2 }}
-      >
-        New Slot
-      </Button>
       {currentSlots.map((value: PlaylistConfigSlot, key: number) => (
         <Card variant="outlined" key={key} sx={{ marginTop: 1 }}>
           <CardHeader
@@ -276,6 +269,14 @@ export default function Slots({
           </CardContent>
         </Card>
       ))}
+      <Button
+        variant="outlined"
+        color="success"
+        onClick={handleNewSlot}
+        sx={{ marginTop: 2 }}
+      >
+        New Slot
+      </Button>
     </React.Fragment>
   );
 }
