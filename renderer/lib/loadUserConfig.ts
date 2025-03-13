@@ -9,7 +9,7 @@ export default async function loadUserConfig() {
       return null;
     }
     const jsonData = JSON.parse(data.toString());
-  
+
     console.log("User configs loaded.");
     return jsonData;
   }

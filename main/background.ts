@@ -72,7 +72,6 @@ const selectMediaDir = async (window) => {
     ],
     properties: ["openDirectory", "multiSelections"],
   });
-  // TODO: Get duration
   if (!canceled) {
     const files = {};
     for (const filePath of filePaths) {
@@ -95,7 +94,6 @@ const selectMediaDir = async (window) => {
 
 // Returns an object with properties filePath and duration
 const selectMediaFile = async (window) => {
-  console.log("Meow")
   const { canceled, filePaths } = await dialog.showOpenDialog(window, {
     title: "Select Media File",
     filters: [

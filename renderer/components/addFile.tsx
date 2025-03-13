@@ -154,8 +154,10 @@ export default function AddFile() {
             />
             {fileData && (
               <Typography variant="body1">
-                {    // @ts-ignore: Object is possibly 'null'  
-                "Duration: " + fileData.duration + "s"}
+                {
+                  // @ts-ignore: Object is possibly 'null'
+                  "Duration: " + fileData.duration + "s"
+                }
               </Typography>
             )}
             <FormControl fullWidth>

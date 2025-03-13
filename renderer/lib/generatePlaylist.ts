@@ -134,7 +134,7 @@ export default async function generatePlaylist(
         validFiles.splice(randomIndex, 1);
       }
     }
-    
+
     isFiller = false;
     generatedPlaylist.slots.push(newSlot);
   }

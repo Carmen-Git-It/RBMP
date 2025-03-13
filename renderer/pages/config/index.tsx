@@ -39,13 +39,15 @@ export default function Config() {
   const [currentConfig, setCurrentConfig] = useState(
     configs[currentConfigIndex],
   );
-  const [currentSlots, setCurrentSlots] = useState(configs.length > 0 ? 
-    configs[currentConfigIndex].slots.slice() : []
+  const [currentSlots, setCurrentSlots] = useState(
+    configs.length > 0 ? configs[currentConfigIndex].slots.slice() : [],
   );
-  const [name, setName] = useState(configs.length > 0 ? configs[currentConfigIndex].name : "");
+  const [name, setName] = useState(
+    configs.length > 0 ? configs[currentConfigIndex].name : "",
+  );
   const [newConfig, setNewConfig] = useState(false);
-  const [description, setDescription] = useState( configs.length > 0 ?
-    configs[currentConfigIndex].description : ""
+  const [description, setDescription] = useState(
+    configs.length > 0 ? configs[currentConfigIndex].description : "",
   );
 
   useEffect(() => {
@@ -137,9 +139,7 @@ export default function Config() {
   }
 
   if (!configs || configs.length === 0) {
-    return (
-      <Typography variant="h1">Wait for stuff to load, yo.</Typography>
-    );
+    return <Typography variant="h1">Wait for stuff to load, yo.</Typography>;
   }
 
   return (

@@ -19,14 +19,15 @@ import {
 import { MobileTimePicker } from "@mui/x-date-pickers/MobileTimePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import React, { useEffect, useState } from "react";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 
 import VideoType from "../lib/model/videoType";
 import PlaylistConfigSlot from "../lib/model/playlistConfigSlot";
-import { typesAtom } from "../store/store";
+import { filesAtom, typesAtom } from "../store/store";
 import writeData from "../lib/writeData";
 import dayjs, { Dayjs } from "dayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers";
+import VideoFile from "../lib/model/videoFile";
 
 export default function Slots({
   currentConfig,
@@ -34,6 +35,7 @@ export default function Slots({
   setCurrentSlots,
 }) {
   const [types, setTypes] = useAtom(typesAtom);
+  const files = useAtomValue(filesAtom);
   const [typeModalOpen, setTypeModalOpen] = useState(false);
   const [newTypeName, setNewTypeName] = useState("");
   const [newTypeSlot, setNewTypeSlot] = useState(0);
@@ -74,7 +76,8 @@ export default function Slots({
 
   function handleChangeStartTime(val: Dayjs, index: number) {
     const tempSlots = currentSlots.slice();
-    const duration = currentSlots[index].endTime - currentSlots[index].startTime;
+    const duration =
+      currentSlots[index].endTime - currentSlots[index].startTime;
     tempSlots[index].startTime = val.get("hours") * 60 + val.get("minutes");
     tempSlots[index].endTime = tempSlots[index].startTime + duration;
     tempSlots.sort((a, b) => a.startTime - b.startTime);
@@ -141,6 +144,19 @@ export default function Slots({
 
   function handleChangeTypeName(e) {
     setNewTypeName(e.target.value);
+  }
+
+  function handleFitSlot(index: number) {
+    const tempFiles: VideoFile[] = files.filter(
+      (f) => f.type.id === currentSlots[index].type.id,
+    );
+    let maxDuration = 0;
+    for (const f of tempFiles) {
+      maxDuration = f.duration > maxDuration ? f.duration : maxDuration;
+    }
+    const tempSlots = currentSlots.slice();
+    tempSlots[index].endTime = currentSlots[index].startTime + maxDuration / 60;
+    setCurrentSlots(tempSlots);
   }
 
   return (
@@ -252,7 +268,6 @@ export default function Slots({
                   onAccept={(val) => handleChangeStartTime(val, key)}
                 />
               </LocalizationProvider>
-
               <Typography>End Time</Typography>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <MobileTimePicker
@@ -266,6 +281,13 @@ export default function Slots({
                 />
               </LocalizationProvider>
             </Stack>
+            <Button
+              sx={{ marginTop: 2 }}
+              variant="outlined"
+              onClick={() => handleFitSlot(key)}
+            >
+              Fit to Type
+            </Button>
           </CardContent>
         </Card>
       ))}
@@ -273,7 +295,7 @@ export default function Slots({
         variant="outlined"
         color="success"
         onClick={handleNewSlot}
-        sx={{ marginTop: 2 }}
+        sx={{ margin: 1 }}
       >
         New Slot
       </Button>

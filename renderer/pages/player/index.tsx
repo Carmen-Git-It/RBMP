@@ -31,7 +31,9 @@ export default function Player() {
   const [content, setContent] = useState("");
   const [contentTitle, setContentTitle] = useState("");
   const [intervalTick, setIntervalTick] = useState(false);
-  const [currentMinute, setCurrentMinute] = useState(dayjs().get("minutes") + dayjs().get("hours") * 60)
+  const [currentMinute, setCurrentMinute] = useState(
+    dayjs().get("minutes") + dayjs().get("hours") * 60,
+  );
   const player = useRef<ReactPlayer>();
   const [isReady, setIsReady] = useState(true);
   const [paused, setPaused] = useState(false);
@@ -49,8 +51,6 @@ export default function Player() {
 
   const [hasWindow, setHasWindow] = useState(false);
   useEffect(() => {
-    console.log("WINDOW RE-RENDER");
-    console.log("HEIGHT: " + height);
     if (typeof window !== "undefined") {
       setIntervalTick(!intervalTick);
       setHeight(window.innerHeight - 100);
@@ -87,7 +87,7 @@ export default function Player() {
       }
 
       const d = dayjs();
-      const minutes = d.minute() + d.hour() * 60
+      const minutes = d.minute() + d.hour() * 60;
       if (minutes !== currentMinute) {
         setCurrentMinute(minutes);
 

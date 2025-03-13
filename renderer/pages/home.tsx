@@ -186,7 +186,7 @@ export default function HomePage() {
     // files.push(file1);
     // setFiles(files);
 
-    return { configs: configs, types: types}//, files: files };
+    return { configs: configs, types: types }; //, files: files };
   }
 
   const handleTabChange = (event: React.SyntheticEvent, newTab: number) => {
