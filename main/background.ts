@@ -72,6 +72,7 @@ const selectMediaDir = async (window) => {
     ],
     properties: ["openDirectory", "multiSelections"],
   });
+
   if (!canceled) {
     const files = {};
     for (const filePath of filePaths) {
@@ -82,8 +83,12 @@ const selectMediaDir = async (window) => {
         validMediaTypes.includes(path.extname(p)),
       );
       for (const p of files[filePath]) {
-        const d = await getVideoDurationInSeconds(filePath + "/" + p);
-        arr.push({ filePath: p, duration: d });
+        try {
+          const d = await getVideoDurationInSeconds(filePath + "/" + p);
+          arr.push({ filePath: p, duration: d });
+        } catch (e) {
+          console.log("File error: " + e);
+        }
       }
 
       files[filePath] = arr;
