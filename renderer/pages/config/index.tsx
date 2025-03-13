@@ -16,6 +16,7 @@ import { useAtom, useAtomValue } from "jotai";
 import React, { useEffect, useState } from "react";
 import {
   currentPlaylistConfigIdAtom,
+  fillerAtom,
   playlistConfigAtom,
   typesAtom,
 } from "../../store/store";
@@ -30,6 +31,7 @@ import FillerContentType from "./fillerContentType";
 
 export default function Config() {
   const types = useAtomValue(typesAtom);
+  const fillerType = useAtomValue(fillerAtom);
   const [configs, setConfigs] = useAtom(playlistConfigAtom);
   const [currentConfigIndex, setCurrentConfigIndex] = useAtom(
     currentPlaylistConfigIdAtom,
@@ -52,6 +54,10 @@ export default function Config() {
       setNewConfig(false);
     }
   }, [configs]);
+
+  useEffect(() => {
+    writeData("config.conf", {currentConfigIndex: currentConfigIndex, fillerType: fillerType});
+  }, [currentConfigIndex, fillerType])
 
   function handleChangeCurrentConfig(e: SelectChangeEvent) {
     const index = Number.parseInt(e.target.value);
@@ -179,7 +185,6 @@ export default function Config() {
                   <Paper elevation={6}>
                     <Slots
                       currentConfig={currentConfig}
-                      setCurrentConfig={setCurrentConfig}
                       currentSlots={currentSlots}
                       setCurrentSlots={setCurrentSlots}
                     />

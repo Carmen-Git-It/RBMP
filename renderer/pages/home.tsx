@@ -26,6 +26,7 @@ import loadTypes from "../lib/loadTypes";
 import loadFiles from "../lib/loadFiles";
 import loadPlaylist from "../lib/loadPlaylist";
 import dayjs from "dayjs";
+import loadUserConfig from "../lib/loadUserConfig";
 
 const Root = styled("div")(() => {
   return {
@@ -257,6 +258,14 @@ export default function HomePage() {
           }
         }
       });
+
+      loadUserConfig().then((data) => {
+        if (data) {
+          setCurrentConfig(data.currentConfigIndex);
+          const t = new VideoType().deserialize(data.fillerType);
+          setFillerType(t);
+        }
+      })
       setRunOnce(true);
     }
 
