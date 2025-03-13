@@ -31,6 +31,7 @@ export default function Player() {
   const [content, setContent] = useState("");
   const [contentTitle, setContentTitle] = useState("");
   const [intervalTick, setIntervalTick] = useState(false);
+  const [currentMinute, setCurrentMinute] = useState(dayjs().get("minutes") + dayjs().get("hours") * 60)
   const player = useRef<ReactPlayer>();
   const [isReady, setIsReady] = useState(true);
   const [paused, setPaused] = useState(false);
@@ -51,6 +52,7 @@ export default function Player() {
     console.log("WINDOW RE-RENDER");
     console.log("HEIGHT: " + height);
     if (typeof window !== "undefined") {
+      setIntervalTick(!intervalTick);
       setHeight(window.innerHeight - 100);
       window.addEventListener("resize", () => {
         setHeight(window.innerHeight - 100);
@@ -78,10 +80,50 @@ export default function Player() {
     if (hasWindow) {
       const interval = setInterval(() => {
         setIntervalTick(!intervalTick);
-      }, 60000);
+      }, 15000);
 
       if (playlist !== undefined && dayjs().date() !== playlist.date.date()) {
         handleMakePlaylist();
+      }
+
+      const d = dayjs();
+      const minutes = d.minute() + d.hour() * 60
+      if (minutes !== currentMinute) {
+        setCurrentMinute(minutes);
+
+        if (playlist !== null && playlist !== undefined) {
+          const minutes = d.get("minutes") + d.get("hours") * 60;
+
+          const slots = playlist.slots.filter((item: PlaylistSlot) => {
+            return item.startTime <= minutes && item.endTime > minutes;
+          })[0];
+          if (
+            slots !== undefined &&
+            slots.files !== undefined &&
+            slots.files.length > 0
+          ) {
+            console.log("MEOW2");
+            const video = slots.files.filter((item: PlaylistFile) => {
+              return item.timeStart <= minutes && item.timeEnd > minutes;
+            })[0];
+            if (video) {
+              setContent("file://" + video.file.filePath);
+              setContentTitle(video.file.fileName + "");
+              setCurrentFile(video);
+              setIsReady(false);
+            } else {
+              setContent("");
+              setContentTitle("No video set to play at this time.");
+            }
+          } else {
+            console.log("MEOW BAD");
+            setContent("");
+            setContentTitle("No video set to play at this time.");
+          }
+        } else {
+          setContent("");
+          setContentTitle("No playlist set");
+        }
       }
 
       return () => clearInterval(interval);
@@ -96,15 +138,13 @@ export default function Player() {
   }, [hasWindow]);
 
   useEffect(() => {
-    console.log("PLAYLIST RE-RENDER");
-
     const date = new Date();
     const minutes =
       date.getMinutes() + date.getHours() * 60 + date.getSeconds() / 60;
 
     if (playlist !== null && playlist !== undefined) {
       const slots = playlist.slots.filter((item: PlaylistSlot) => {
-        return item.startTime < minutes && item.endTime > minutes;
+        return item.startTime <= minutes && item.endTime > minutes;
       })[0];
 
       if (
@@ -113,7 +153,7 @@ export default function Player() {
         slots.files.length > 0
       ) {
         const video = slots.files.filter((item: PlaylistFile) => {
-          return item.timeStart < minutes && item.timeEnd > minutes;
+          return item.timeStart <= minutes && item.timeEnd > minutes;
         })[0];
         if (video) {
           setContent("file://" + video.file.filePath);
@@ -137,13 +177,11 @@ export default function Player() {
   // Track the video to the correct time
   useEffect(() => {
     if (!isReady && hasWindow) {
-      console.log("Not ready");
       if (player.current) {
         const date = new Date();
         const minutes =
           date.getMinutes() + date.getHours() * 60 + date.getSeconds() / 60;
         if ((minutes - currentFile.timeStart) * 60 > 10) {
-          console.log("seeking to: " + (minutes - currentFile.timeStart) * 60);
           player?.current?.seekTo((minutes - currentFile.timeStart) * 60);
         }
       }
@@ -158,14 +196,18 @@ export default function Player() {
 
     // +/- 1 on the time to account for seconds being factored into playlist generation
     const slots = playlist.slots.filter((item: PlaylistSlot) => {
-      return item.startTime < minutes && item.endTime + 0.5 > minutes;
+      return item.startTime <= minutes && item.endTime + 0.5 > minutes;
     })[0];
 
     const video = slots.files.filter((item: PlaylistFile) => {
-      return item.timeStart < minutes && item.timeEnd > minutes;
+      return item.timeStart <= minutes && item.timeEnd > minutes;
     })[0];
 
-    if (video) {
+    if (video && video.file.id === currentFile.file.id) {
+      setCurrentFile(video);
+      player?.current?.seekTo(0, "seconds");
+      setPlaying(true);
+    } else if (video) {
       setContent("file://" + video.file.filePath);
       setContentTitle(video.file.fileName + "");
       setCurrentFile(video);
