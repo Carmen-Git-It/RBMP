@@ -36,8 +36,12 @@ export default function Config() {
     currentPlaylistConfigIdAtom,
   );
   const [height, setHeight] = useState(0);
-  const [currentConfig, setCurrentConfig] = useState(configs[currentConfigIndex]);
-  const [currentSlots, setCurrentSlots] = useState(configs[currentConfigIndex].slots.slice());
+  const [currentConfig, setCurrentConfig] = useState(
+    configs[currentConfigIndex],
+  );
+  const [currentSlots, setCurrentSlots] = useState(
+    configs[currentConfigIndex].slots.slice(),
+  );
   const [name, setName] = useState(configs[currentConfigIndex].name);
   const [newConfig, setNewConfig] = useState(false);
   const [description, setDescription] = useState(
@@ -72,8 +76,11 @@ export default function Config() {
   }, [configs]);
 
   useEffect(() => {
-    writeData("config.conf", {currentConfigIndex: currentConfigIndex, fillerType: fillerType});
-  }, [currentConfigIndex, fillerType])
+    writeData("config.conf", {
+      currentConfigIndex: currentConfigIndex,
+      fillerType: fillerType,
+    });
+  }, [currentConfigIndex, fillerType]);
 
   function handleChangeCurrentConfig(e: SelectChangeEvent) {
     const index = Number.parseInt(e.target.value);
@@ -133,10 +140,10 @@ export default function Config() {
         Config
       </Typography>
       <Grid container spacing={2} sx={{ paddingBottom: 1 }}>
-        <Grid item md={6} sx={{height: height}}>
+        <Grid item md={6} sx={{ height: height }}>
           <Paper
             elevation={3}
-            sx={{ padding: 2, overflow: "auto", maxHeight: "100%"}}
+            sx={{ padding: 2, overflow: "auto", maxHeight: "100%" }}
           >
             <Stack spacing={2}>
               <Stack spacing={1} direction="row">
@@ -218,8 +225,8 @@ export default function Config() {
             </Stack>
           </Paper>
         </Grid>
-        <Grid item md={6} sx={{height: height}}>
-          <Stack sx={{maxHeight: "100%", overflow: "auto"}}>
+        <Grid item md={6} sx={{ height: height }}>
+          <Stack sx={{ maxHeight: "100%", overflow: "auto" }}>
             <FillerContentType />
             <FilesConfig />
           </Stack>

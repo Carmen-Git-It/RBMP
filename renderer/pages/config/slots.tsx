@@ -23,9 +23,7 @@ import { useAtom } from "jotai";
 
 import VideoType from "../../lib/model/videoType";
 import PlaylistConfigSlot from "../../lib/model/playlistConfigSlot";
-import {
-  typesAtom,
-} from "../../store/store";
+import { typesAtom } from "../../store/store";
 import writeData from "../../lib/writeData";
 import dayjs, { Dayjs } from "dayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers";
@@ -40,11 +38,15 @@ export default function Slots({
   const [newTypeName, setNewTypeName] = useState("");
   const [newTypeSlot, setNewTypeSlot] = useState(0);
 
-
   useEffect(() => {
     // Clone
-    const tempSlots = currentConfig.slots.map((a: PlaylistConfigSlot) => {return {...a}});
-    tempSlots.sort((a: PlaylistConfigSlot, b: PlaylistConfigSlot) => a.startTime - b.startTime)
+    const tempSlots = currentConfig.slots.map((a: PlaylistConfigSlot) => {
+      return { ...a };
+    });
+    tempSlots.sort(
+      (a: PlaylistConfigSlot, b: PlaylistConfigSlot) =>
+        a.startTime - b.startTime,
+    );
     setCurrentSlots(tempSlots);
   }, [currentConfig]);
 
@@ -63,13 +65,15 @@ export default function Slots({
     } else {
       const index = Number.parseInt(e.target.name);
       const tempSlots = currentSlots.slice();
-      tempSlots[index].type = types.filter((t) => t.id.localeCompare(e.target.value) === 0)[0];
+      tempSlots[index].type = types.filter(
+        (t) => t.id.localeCompare(e.target.value) === 0,
+      )[0];
       setCurrentSlots(tempSlots);
     }
   }
 
   function handleChangeStartTime(val: Dayjs, index: number) {
-    console.log("HANDLE CHANGE START TIME")
+    console.log("HANDLE CHANGE START TIME");
     const tempSlots = currentSlots.slice();
     tempSlots[index].startTime = val.get("hours") * 60 + val.get("minutes");
     tempSlots.sort((a, b) => a.startTime - b.startTime);
@@ -106,7 +110,7 @@ export default function Slots({
 
   function handleDeleteSlot(index: number) {
     console.log("Deleting slot: " + index);
-    
+
     const tempSlots = currentSlots.slice();
     tempSlots.splice(index, 1);
     setCurrentSlots(tempSlots);
@@ -236,12 +240,7 @@ export default function Slots({
                 control={
                   <Checkbox
                     checked={value.featured}
-                    onChange={() =>
-                      handleChangeFeatured(
-                        !value.featured,
-                        key,
-                      )
-                    }
+                    onChange={() => handleChangeFeatured(!value.featured, key)}
                   ></Checkbox>
                 }
                 label="Featured Content"
@@ -251,14 +250,12 @@ export default function Slots({
               <Typography>Start Time</Typography>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <MobileTimePicker
-                  value={
-                    dayjs(
-                        "2022-04-17T" +
-                          Math.floor(value.startTime / 60) +
-                          ":" +
-                          (value.startTime % 60),
-                      )
-                  }
+                  value={dayjs(
+                    "2022-04-17T" +
+                      Math.floor(value.startTime / 60) +
+                      ":" +
+                      (value.startTime % 60),
+                  )}
                   onAccept={(val) => handleChangeStartTime(val, key)}
                 />
               </LocalizationProvider>
@@ -266,14 +263,12 @@ export default function Slots({
               <Typography>End Time</Typography>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <MobileTimePicker
-                  value={
-                    dayjs(
-                          "2022-04-17T" +
-                            Math.floor(value.endTime / 60) +
-                            ":" +
-                            (value.endTime % 60),
-                        )
-                  }
+                  value={dayjs(
+                    "2022-04-17T" +
+                      Math.floor(value.endTime / 60) +
+                      ":" +
+                      (value.endTime % 60),
+                  )}
                   onAccept={(val) => handleChangeEndTime(val, key)}
                 />
               </LocalizationProvider>

@@ -19,7 +19,7 @@ export default function FillerContentType() {
     if (!currentType) {
       setCurrentType(types[1]);
     }
-  }, [])
+  }, []);
 
   function handleChangeType(e: SelectChangeEvent) {
     setCurrentType(

@@ -265,7 +265,7 @@ export default function HomePage() {
           const t = new VideoType().deserialize(data.fillerType);
           setFillerType(t);
         }
-      })
+      });
       setRunOnce(true);
     }
 
