@@ -73,7 +73,7 @@ export default function HomePage() {
     file.generateUUID();
     file.fileName = "Men's Fashion";
     file.filePath = "C:/mens_fashion.mp4";
-    file.duration = 360;
+    file.duration = 281;
     file.type = tempType;
     file.muted = false;
     const playlistFile: PlaylistFile = new PlaylistFile();
@@ -88,7 +88,7 @@ export default function HomePage() {
     file1.fileName = "Doctor Who Season 3 Episode 1";
     file1.filePath =
       "C:/Users/fang2/OneDrive/Documents/coding/RBMP/sample_video/doctor_who_3_1.mp4";
-    file1.duration = 360;
+    file1.duration = 1337;
     file1.type = tempType2;
     file1.muted = false;
     const playlistFile1: PlaylistFile = new PlaylistFile();

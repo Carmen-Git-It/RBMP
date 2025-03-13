@@ -22,13 +22,10 @@ import {
 import writeData from "../../lib/writeData";
 import FilesConfig from "./filesConfig";
 import Slots from "./slots";
-import VideoType from "../../lib/model/videoType";
-import { Dayjs } from "dayjs";
 import PlaylistConfig from "../../lib/model/playlistConfig";
 import PlaylistConfigSlot from "../../lib/model/playlistConfigSlot";
 import FillerContentType from "./fillerContentType";
 
-// TODO: Filler type
 // TODO: MaxHeight based on window height for better fullscreen
 
 export default function Config() {
@@ -37,45 +34,13 @@ export default function Config() {
   const [currentConfigIndex, setCurrentConfigIndex] = useAtom(
     currentPlaylistConfigIdAtom,
   );
-  const [currentConfig, setCurrentConfig] = useState(
-    configs[currentConfigIndex],
-  );
-  const [startTimes, setStartTimes] = useState(new Array<Dayjs>());
-  const [endTimes, setEndTimes] = useState(new Array<Dayjs>());
-  const [featured, setFeatured] = useState(new Array<boolean>());
-  const [slotTypes, setSlotTypes] = useState(new Array<VideoType>());
+  const [currentConfig, setCurrentConfig] = useState(configs[currentConfigIndex]);
+  const [currentSlots, setCurrentSlots] = useState(configs[currentConfigIndex].slots.slice());
   const [name, setName] = useState(configs[currentConfigIndex].name);
   const [newConfig, setNewConfig] = useState(false);
   const [description, setDescription] = useState(
     configs[currentConfigIndex].description,
   );
-
-  useEffect(() => {
-    if (startTimes.length === 0) {
-      const tempArr = new Array<Dayjs>(
-        configs[currentConfigIndex].slots.length,
-      );
-      setStartTimes(tempArr);
-    }
-    if (endTimes.length === 0) {
-      const tempArr = new Array<Dayjs>(
-        configs[currentConfigIndex].slots.length,
-      );
-      setEndTimes(tempArr);
-    }
-    if (slotTypes.length === 0) {
-      const tempTypes = new Array<VideoType>(
-        configs[currentConfigIndex].slots.length,
-      );
-      setSlotTypes(tempTypes);
-    }
-    if (featured.length === 0) {
-      const tempFeatured = new Array<boolean>(
-        configs[currentConfigIndex].slots.length,
-      );
-      setFeatured(tempFeatured);
-    }
-  }, []);
 
   useEffect(() => {
     if (newConfig) {
@@ -88,29 +53,6 @@ export default function Config() {
     }
   }, [configs]);
 
-  useEffect(() => {
-    if (currentConfig) {
-      setSlotArrLength();
-    }
-  }, [currentConfig]);
-
-  function setSlotArrLength() {
-    const tempStarts = new Array<Dayjs>(
-      configs[currentConfigIndex].slots.length,
-    );
-    setStartTimes(tempStarts);
-    const tempEnds = new Array<Dayjs>(configs[currentConfigIndex].slots.length);
-    setEndTimes(tempEnds);
-    const tempTypes = new Array<VideoType>(
-      configs[currentConfigIndex].slots.length,
-    );
-    setSlotTypes(tempTypes);
-    const tempFeatured = new Array<boolean>(
-      configs[currentConfigIndex].slots.length,
-    );
-    setFeatured(tempFeatured);
-  }
-
   function handleChangeCurrentConfig(e: SelectChangeEvent) {
     const index = Number.parseInt(e.target.value);
     setCurrentConfigIndex(index);
@@ -119,35 +61,14 @@ export default function Config() {
     setDescription(configs[index].description);
 
     setCurrentConfig(configs[index]);
-
-    setSlotArrLength();
   }
 
   function handleSaveConfig() {
     const tempConfigs = configs.slice();
-    for (let i = 0; i < tempConfigs[currentConfigIndex].slots.length; i++) {
-      // Start time
-      if (startTimes[i] !== undefined) {
-        tempConfigs[currentConfigIndex].slots[i].startTime =
-          startTimes[i].get("minutes") + startTimes[i].get("hours") * 60;
-      }
-      // End time
-      if (endTimes[i] !== undefined) {
-        tempConfigs[currentConfigIndex].slots[i].endTime =
-          endTimes[i].get("minutes") + endTimes[i].get("hours") * 60;
-      }
-      // Type
-      if (slotTypes[i] !== undefined) {
-        tempConfigs[currentConfigIndex].slots[i].type = slotTypes[i];
-      }
-      // Featured
-      if (featured[i] !== undefined) {
-        tempConfigs[currentConfigIndex].slots[i].featured = featured[i];
-      }
-    }
-
-    tempConfigs[currentConfigIndex].name = name;
-    tempConfigs[currentConfigIndex].description = description;
+    currentConfig.slots = currentSlots;
+    currentConfig.name = name;
+    currentConfig.description = description;
+    tempConfigs[currentConfigIndex] = currentConfig;
     setConfigs(tempConfigs);
     setCurrentConfig(tempConfigs[currentConfigIndex]);
     writeData("configs.conf", tempConfigs);
@@ -257,15 +178,10 @@ export default function Config() {
                   />
                   <Paper elevation={6}>
                     <Slots
-                      startTimes={startTimes}
-                      setStartTimes={setStartTimes}
-                      endTimes={endTimes}
-                      setEndTimes={setEndTimes}
-                      slotTypes={slotTypes}
-                      setSlotTypes={setSlotTypes}
                       currentConfig={currentConfig}
-                      featured={featured}
-                      setFeatured={setFeatured}
+                      setCurrentConfig={setCurrentConfig}
+                      currentSlots={currentSlots}
+                      setCurrentSlots={setCurrentSlots}
                     />
                   </Paper>
                   <Button

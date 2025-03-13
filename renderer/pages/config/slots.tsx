@@ -19,13 +19,11 @@ import {
 import { MobileTimePicker } from "@mui/x-date-pickers/MobileTimePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import React, { useEffect, useState } from "react";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom } from "jotai";
 
 import VideoType from "../../lib/model/videoType";
 import PlaylistConfigSlot from "../../lib/model/playlistConfigSlot";
 import {
-  currentPlaylistConfigIdAtom,
-  playlistConfigAtom,
   typesAtom,
 } from "../../store/store";
 import writeData from "../../lib/writeData";
@@ -33,30 +31,24 @@ import dayjs, { Dayjs } from "dayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 
 export default function Slots({
-  startTimes,
-  setStartTimes,
-  endTimes,
-  setEndTimes,
-  slotTypes,
-  setSlotTypes,
   currentConfig,
-  featured,
-  setFeatured,
+  currentSlots,
+  setCurrentSlots,
 }) {
   const [types, setTypes] = useAtom(typesAtom);
-  const [configs, setConfigs] = useAtom(playlistConfigAtom);
-  const currentConfigIndex = useAtomValue(currentPlaylistConfigIdAtom);
-
   const [typeModalOpen, setTypeModalOpen] = useState(false);
   const [newTypeName, setNewTypeName] = useState("");
   const [newTypeSlot, setNewTypeSlot] = useState(0);
-  const [currentSlots, setCurrentSlots] = useState(currentConfig.slots.slice());
+
 
   useEffect(() => {
-    setCurrentSlots(currentConfig.slots.slice());
+    // Clone
+    const tempSlots = currentConfig.slots.map((a: PlaylistConfigSlot) => {return {...a}});
+    tempSlots.sort((a: PlaylistConfigSlot, b: PlaylistConfigSlot) => a.startTime - b.startTime)
+    setCurrentSlots(tempSlots);
   }, [currentConfig]);
 
-  function handleOpenTypeModal(index) {
+  function handleOpenTypeModal(index: number) {
     setNewTypeSlot(index);
     setTypeModalOpen(true);
   }
@@ -70,31 +62,30 @@ export default function Slots({
       handleOpenTypeModal(Number.parseInt(e.target.name));
     } else {
       const index = Number.parseInt(e.target.name);
-      const tempTypes: VideoType[] = slotTypes.slice();
-      const temp = types.filter((t) => t.id === e.target.value)[0];
-      tempTypes[index] = temp;
-      setSlotTypes(tempTypes);
+      const tempSlots = currentSlots.slice();
+      tempSlots[index].type = types.filter((t) => t.id.localeCompare(e.target.value) === 0)[0];
+      setCurrentSlots(tempSlots);
     }
   }
 
   function handleChangeStartTime(val: Dayjs, index: number) {
-    const tempStarts = startTimes;
-    tempStarts[index] = val;
-    setStartTimes(tempStarts);
+    console.log("HANDLE CHANGE START TIME")
+    const tempSlots = currentSlots.slice();
+    tempSlots[index].startTime = val.get("hours") * 60 + val.get("minutes");
+    tempSlots.sort((a, b) => a.startTime - b.startTime);
+    setCurrentSlots(tempSlots);
   }
 
   function handleChangeEndTime(val: Dayjs, index: number) {
-    const tempEnds = endTimes;
-    tempEnds[index] = val;
-    setEndTimes(tempEnds);
+    const tempSlots = currentSlots.slice();
+    tempSlots[index].endTime = val.get("hours") * 60 + val.get("minutes");
+    setCurrentSlots(tempSlots);
   }
 
   function handleChangeFeatured(val: boolean, index: number) {
-    console.log("FEATURED[i]:  " + featured[index]);
-    console.log("HANDLE CHANGE FEATURED  " + val);
-    const tempFeatured = featured.slice();
-    tempFeatured[index] = val;
-    setFeatured(tempFeatured);
+    const tempSlots = currentSlots.slice();
+    tempSlots[index].featured = val;
+    setCurrentSlots(tempSlots);
   }
 
   function handleNewSlot() {
@@ -108,26 +99,6 @@ export default function Slots({
     tempSlot.type = types[1];
     tempSlot.featured = false;
 
-    const tempFeatured = featured.slice();
-    tempFeatured.unshift(undefined);
-    setFeatured(tempFeatured);
-
-    const tempSlotTypes = slotTypes.slice();
-    tempSlotTypes.unshift(undefined);
-    setSlotTypes(tempSlotTypes);
-
-    const tempStarts = startTimes;
-    tempStarts.unshift(undefined);
-    setStartTimes(tempStarts);
-
-    const tempEnds = endTimes;
-    tempEnds.unshift(undefined);
-    setEndTimes(tempEnds);
-
-    const tempConfigs = configs.slice();
-    tempConfigs[currentConfigIndex].slots.unshift(tempSlot);
-    setConfigs(tempConfigs);
-
     const tempSlots = currentSlots.slice();
     tempSlots.unshift(tempSlot);
     setCurrentSlots(tempSlots);
@@ -135,27 +106,10 @@ export default function Slots({
 
   function handleDeleteSlot(index: number) {
     console.log("Deleting slot: " + index);
-    const tempConfigs = configs;
-    tempConfigs[currentConfigIndex].slots.splice(index, 1);
-
-    const tempFeatured = featured;
-    tempFeatured.splice(index, 1);
-    setFeatured(tempFeatured);
-
-    const tempStarts = startTimes;
-    tempStarts.splice(index, 1);
-    setStartTimes(tempStarts);
-
-    const tempEnds = endTimes;
-    tempEnds.splice(index, 1);
-    setEndTimes(tempEnds);
-
-    const tempSlotTypes = slotTypes;
-    tempSlotTypes.splice(index, 1);
-    setSlotTypes(tempSlotTypes);
-
-    setConfigs(tempConfigs.slice());
-    setCurrentSlots(tempConfigs[currentConfigIndex].slots.slice());
+    
+    const tempSlots = currentSlots.slice();
+    tempSlots.splice(index, 1);
+    setCurrentSlots(tempSlots);
   }
 
   // Save new type and set slot type to new type
@@ -169,9 +123,9 @@ export default function Slots({
     setTypes(tempTypes);
     writeData("types.conf", tempTypes);
 
-    configs[currentConfigIndex].slots[newTypeSlot].type =
-      types[types.length - 1];
-    slotTypes[newTypeSlot] = tempType;
+    const tempSlots = currentSlots.slice();
+    tempSlots[newTypeSlot].type = tempType;
+    setCurrentSlots(tempSlots);
 
     setTypeModalOpen(false);
   }
@@ -266,12 +220,7 @@ export default function Slots({
                 <Select
                   labelId={"slot-type-select-label" + key}
                   id={"slot-type-select" + key}
-                  defaultValue={value.type.id}
-                  value={
-                    slotTypes[key] !== undefined
-                      ? slotTypes[key].id
-                      : value.type.id
-                  }
+                  value={value.type.id}
                   onChange={handleChangeType}
                   name={key + ""}
                   label="Media Type"
@@ -286,16 +235,10 @@ export default function Slots({
               <FormControlLabel
                 control={
                   <Checkbox
-                    checked={
-                      featured[key] !== undefined
-                        ? featured[key]
-                        : value.featured
-                    }
+                    checked={value.featured}
                     onChange={() =>
                       handleChangeFeatured(
-                        featured[key] !== undefined
-                          ? !featured[key]
-                          : !value.featured,
+                        !value.featured,
                         key,
                       )
                     }
@@ -309,16 +252,14 @@ export default function Slots({
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <MobileTimePicker
                   value={
-                    startTimes[key] !== undefined
-                      ? startTimes[key]
-                      : dayjs(
-                          "2022-04-17T" +
-                            Math.floor(value.startTime / 60) +
-                            ":" +
-                            (value.startTime % 60),
-                        )
+                    dayjs(
+                        "2022-04-17T" +
+                          Math.floor(value.startTime / 60) +
+                          ":" +
+                          (value.startTime % 60),
+                      )
                   }
-                  onChange={(val) => handleChangeStartTime(val, key)}
+                  onAccept={(val) => handleChangeStartTime(val, key)}
                 />
               </LocalizationProvider>
 
@@ -326,16 +267,14 @@ export default function Slots({
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <MobileTimePicker
                   value={
-                    endTimes[key] !== undefined
-                      ? endTimes[key]
-                      : dayjs(
+                    dayjs(
                           "2022-04-17T" +
                             Math.floor(value.endTime / 60) +
                             ":" +
                             (value.endTime % 60),
                         )
                   }
-                  onChange={(val) => handleChangeEndTime(val, key)}
+                  onAccept={(val) => handleChangeEndTime(val, key)}
                 />
               </LocalizationProvider>
             </Stack>
