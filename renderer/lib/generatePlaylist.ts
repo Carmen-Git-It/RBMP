@@ -103,10 +103,6 @@ export default async function generatePlaylist(
           file.file = validFiles[randomIndex];
           file.timeStart = currentTime;
           file.timeEnd = currentTime + validFiles[randomIndex].duration / 60;
-          console.log("FILE DURATION: " + validFiles[randomIndex].duration);
-          console.log(
-            "FILE TIMEEND - TIMESTART: " + (file.timeEnd - file.timeStart),
-          );
           file.muted = slot.muted;
           file.volume = slot.volume;
           newSlot.files.push(file);
@@ -138,7 +134,8 @@ export default async function generatePlaylist(
         validFiles.splice(randomIndex, 1);
       }
     }
-
+    
+    isFiller = false;
     generatedPlaylist.slots.push(newSlot);
   }
 

@@ -20,11 +20,12 @@ import {
 import PlaylistFile from "../../lib/model/playlistFile";
 import PlaylistSlot from "../../lib/model/playlistSlot";
 import generatePlaylist from "../../lib/generatePlaylist";
-import VPlayer from "./player";
+import VPlayer from "../../components/player";
 import writeData from "../../lib/writeData";
 import dayjs from "dayjs";
-import PlaylistView from "./playlist";
+import PlaylistView from "../../components/playlist";
 
+// TODO: Fail gracefully when user lacks all basics
 export default function Player() {
   const [playing, setPlaying] = useState(true);
   const [content, setContent] = useState("");

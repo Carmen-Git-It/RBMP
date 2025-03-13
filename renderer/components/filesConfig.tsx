@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { useAtomValue } from "jotai";
 import React from "react";
-import { filesAtom } from "../../store/store";
+import { filesAtom } from "../store/store";
 import AddFolder from "./addFolder";
 import AddFile from "./addFile";
 

@@ -12,12 +12,12 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import selectMediaFile from "../../lib/selectMediaFile";
+import selectMediaFile from "../lib/selectMediaFile";
 import { useAtom } from "jotai";
-import { filesAtom, typesAtom } from "../../store/store";
-import VideoType from "../../lib/model/videoType";
-import writeData from "../../lib/writeData";
-import VideoFile from "../../lib/model/videoFile";
+import VideoType from "../lib/model/videoType";
+import writeData from "../lib/writeData";
+import VideoFile from "../lib/model/videoFile";
+import { filesAtom, typesAtom } from "../store/store";
 
 export default function AddFile() {
   const [types, setTypes] = useAtom(typesAtom);
@@ -25,7 +25,7 @@ export default function AddFile() {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [fileData, setFileData] = useState();
-  const [fileName, setFileName] = useState();
+  const [fileName, setFileName] = useState("");
   const [fileType, setFileType] = useState(types[1]);
   const [typeModalOpen, setTypeModalOpen] = useState(false);
   const [newTypeName, setNewTypeName] = useState("TypeName");
@@ -66,9 +66,13 @@ export default function AddFile() {
   function handleModalSave() {
     const f = new VideoFile();
     f.generateUUID();
-    f.duration = fileData.duration;
-    f.fileName = fileName;
-    f.filePath = fileData.filePath;
+    if (fileData) {
+      // @ts-ignore: Object is possibly 'null'
+      f.duration = fileData.duration;
+      f.fileName = fileName;
+      // @ts-ignore: Object is possibly 'null'
+      f.filePath = fileData.filePath;
+    }
     f.muted = false;
     f.type = fileType;
 
@@ -150,7 +154,8 @@ export default function AddFile() {
             />
             {fileData && (
               <Typography variant="body1">
-                {"Duration: " + fileData.duration + "s"}
+                {    // @ts-ignore: Object is possibly 'null'  
+                "Duration: " + fileData.duration + "s"}
               </Typography>
             )}
             <FormControl fullWidth>

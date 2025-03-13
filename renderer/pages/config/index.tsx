@@ -21,11 +21,11 @@ import {
   typesAtom,
 } from "../../store/store";
 import writeData from "../../lib/writeData";
-import FilesConfig from "./filesConfig";
-import Slots from "./slots";
+import FilesConfig from "../../components/filesConfig";
+import Slots from "../../components/slots";
 import PlaylistConfig from "../../lib/model/playlistConfig";
 import PlaylistConfigSlot from "../../lib/model/playlistConfigSlot";
-import FillerContentType from "./fillerContentType";
+import FillerContentType from "../../components/fillerContentType";
 
 // TODO: Fail gracefully when user lacks all basics
 export default function Config() {
@@ -39,13 +39,13 @@ export default function Config() {
   const [currentConfig, setCurrentConfig] = useState(
     configs[currentConfigIndex],
   );
-  const [currentSlots, setCurrentSlots] = useState(
-    configs[currentConfigIndex].slots.slice(),
+  const [currentSlots, setCurrentSlots] = useState(configs.length > 0 ? 
+    configs[currentConfigIndex].slots.slice() : []
   );
-  const [name, setName] = useState(configs[currentConfigIndex].name);
+  const [name, setName] = useState(configs.length > 0 ? configs[currentConfigIndex].name : "");
   const [newConfig, setNewConfig] = useState(false);
-  const [description, setDescription] = useState(
-    configs[currentConfigIndex].description,
+  const [description, setDescription] = useState( configs.length > 0 ?
+    configs[currentConfigIndex].description : ""
   );
 
   useEffect(() => {
@@ -76,10 +76,12 @@ export default function Config() {
   }, [configs]);
 
   useEffect(() => {
-    writeData("config.conf", {
-      currentConfigIndex: currentConfigIndex,
-      fillerType: fillerType,
-    });
+    if (currentConfigIndex && fillerType) {
+      writeData("config.conf", {
+        currentConfigIndex: currentConfigIndex,
+        fillerType: fillerType,
+      });
+    }
   }, [currentConfigIndex, fillerType]);
 
   function handleChangeCurrentConfig(e: SelectChangeEvent) {
@@ -132,6 +134,12 @@ export default function Config() {
     setConfigs(tempConfigs);
 
     setNewConfig(true);
+  }
+
+  if (!configs || configs.length === 0) {
+    return (
+      <Typography variant="h1">Wait for stuff to load, yo.</Typography>
+    );
   }
 
   return (

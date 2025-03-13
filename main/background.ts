@@ -95,6 +95,7 @@ const selectMediaDir = async (window) => {
 
 // Returns an object with properties filePath and duration
 const selectMediaFile = async (window) => {
+  console.log("Meow")
   const { canceled, filePaths } = await dialog.showOpenDialog(window, {
     title: "Select Media File",
     filters: [
@@ -108,6 +109,7 @@ const selectMediaFile = async (window) => {
   if (!canceled) {
     const file = {};
     file["filePath"] = filePaths[0];
+    console.log(filePaths[0]);
     const d = await getVideoDurationInSeconds(filePaths[0]);
     file["duration"] = d;
 

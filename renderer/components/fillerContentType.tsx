@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { useAtom, useAtomValue } from "jotai";
 import React, { useEffect } from "react";
-import { fillerAtom, typesAtom } from "../../store/store";
+import { fillerAtom, typesAtom } from "../store/store";
 
 export default function FillerContentType() {
   const types = useAtomValue(typesAtom);

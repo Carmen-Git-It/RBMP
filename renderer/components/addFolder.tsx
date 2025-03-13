@@ -16,12 +16,12 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import selectMediaDir from "../../lib/selectMediaDir";
+import selectMediaDir from "../lib/selectMediaDir";
 import { useAtom } from "jotai";
-import { filesAtom, typesAtom } from "../../store/store";
-import VideoType from "../../lib/model/videoType";
-import writeData from "../../lib/writeData";
-import VideoFile from "../../lib/model/videoFile";
+import { filesAtom, typesAtom } from "../store/store";
+import VideoType from "../lib/model/videoType";
+import writeData from "../lib/writeData";
+import VideoFile from "../lib/model/videoFile";
 
 export default function AddFolder() {
   const [types, setTypes] = useAtom<VideoType[]>(typesAtom);

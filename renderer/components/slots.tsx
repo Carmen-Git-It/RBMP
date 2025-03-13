@@ -21,10 +21,10 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import React, { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 
-import VideoType from "../../lib/model/videoType";
-import PlaylistConfigSlot from "../../lib/model/playlistConfigSlot";
-import { typesAtom } from "../../store/store";
-import writeData from "../../lib/writeData";
+import VideoType from "../lib/model/videoType";
+import PlaylistConfigSlot from "../lib/model/playlistConfigSlot";
+import { typesAtom } from "../store/store";
+import writeData from "../lib/writeData";
 import dayjs, { Dayjs } from "dayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 

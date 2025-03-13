@@ -10,7 +10,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import PlaylistSlot from "../../lib/model/playlistSlot";
+import PlaylistSlot from "../lib/model/playlistSlot";
 
 export default function PlaylistView({ playlistSlots }) {
   const [expanded, setExpanded] = useState([]);

@@ -15,8 +15,6 @@ import {
   typesAtom,
 } from "../store/store";
 import { playlistConfigAtom } from "../store/store";
-import VideoFile from "../lib/model/videoFile";
-import PlaylistFile from "../lib/model/playlistFile";
 import PlaylistConfigSlot from "../lib/model/playlistConfigSlot";
 import VideoType from "../lib/model/videoType";
 import PlaylistConfig from "../lib/model/playlistConfig";
@@ -70,34 +68,34 @@ export default function HomePage() {
     setTypes(types);
 
     // TODO: REMOVE AFTER TESTING
-    const file: VideoFile = new VideoFile();
-    file.generateUUID();
-    file.fileName = "Men's Fashion";
-    file.filePath = "C:/mens_fashion.mp4";
-    file.duration = 281;
-    file.type = tempType;
-    file.muted = false;
-    const playlistFile: PlaylistFile = new PlaylistFile();
-    playlistFile.generateUUID();
-    playlistFile.file = file;
-    playlistFile.timeStart = 0;
-    playlistFile.timeEnd = 1410;
-    playlistFile.volume = 100;
+    // const file: VideoFile = new VideoFile();
+    // file.generateUUID();
+    // file.fileName = "Men's Fashion";
+    // file.filePath = "C:/mens_fashion.mp4";
+    // file.duration = 281;
+    // file.type = tempType;
+    // file.muted = false;
+    // const playlistFile: PlaylistFile = new PlaylistFile();
+    // playlistFile.generateUUID();
+    // playlistFile.file = file;
+    // playlistFile.timeStart = 0;
+    // playlistFile.timeEnd = 1410;
+    // playlistFile.volume = 100;
 
-    const file1: VideoFile = new VideoFile();
-    file1.generateUUID();
-    file1.fileName = "Doctor Who Season 3 Episode 1";
-    file1.filePath =
-      "C:/Users/fang2/OneDrive/Documents/coding/RBMP/sample_video/doctor_who_3_1.mp4";
-    file1.duration = 1337;
-    file1.type = tempType2;
-    file1.muted = false;
-    const playlistFile1: PlaylistFile = new PlaylistFile();
-    playlistFile1.generateUUID();
-    playlistFile1.file = file1;
-    playlistFile1.timeStart = 1411;
-    playlistFile1.timeEnd = 1439;
-    playlistFile1.volume = 100;
+    // const file1: VideoFile = new VideoFile();
+    // file1.generateUUID();
+    // file1.fileName = "Doctor Who Season 3 Episode 1";
+    // file1.filePath =
+    //   "C:/Users/fang2/OneDrive/Documents/coding/RBMP/sample_video/doctor_who_3_1.mp4";
+    // file1.duration = 1337;
+    // file1.type = tempType2;
+    // file1.muted = false;
+    // const playlistFile1: PlaylistFile = new PlaylistFile();
+    // playlistFile1.generateUUID();
+    // playlistFile1.file = file1;
+    // playlistFile1.timeStart = 1411;
+    // playlistFile1.timeEnd = 1439;
+    // playlistFile1.volume = 100;
 
     // TODO REMOVE AFTER TESTING
     const config: PlaylistConfig = new PlaylistConfig();
@@ -183,12 +181,12 @@ export default function HomePage() {
     setConfigs(configs);
 
     // TODO: Remove after testing
-    const files: VideoFile[] = new Array<VideoFile>();
-    files.push(file);
-    files.push(file1);
-    setFiles(files);
+    // const files: VideoFile[] = new Array<VideoFile>();
+    // files.push(file);
+    // files.push(file1);
+    // setFiles(files);
 
-    return { configs: configs, types: types, files: files };
+    return { configs: configs, types: types}//, files: files };
   }
 
   const handleTabChange = (event: React.SyntheticEvent, newTab: number) => {
@@ -234,11 +232,11 @@ export default function HomePage() {
       // Load files
       loadFiles().then((f) => {
         if (f.length === 0) {
-          if (setupResults == null || setupResults == undefined) {
-            setupResults = setup();
-          }
-          const files = setupResults.files;
-          writeData("files.conf", files);
+          // if (setupResults == null || setupResults == undefined) {
+          //   setupResults = setup();
+          // }
+          // const files = setupResults.files;
+          // writeData("files.conf", files);
         } else {
           setFiles(f);
         }
