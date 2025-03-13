@@ -50,9 +50,9 @@ export default function Player() {
     console.log("WINDOW RE-RENDER");
     console.log("HEIGHT: " + height);
     if (typeof window !== "undefined") {
-      setHeight(window.innerHeight - 50);
+      setHeight(window.innerHeight - 100);
       window.addEventListener("resize", () => {
-        setHeight(window.innerHeight - 50);
+        setHeight(window.innerHeight - 100);
       });
       setHasWindow(true);
     }
@@ -66,7 +66,7 @@ export default function Player() {
     return () => {
       setHasWindow(false);
       window.removeEventListener("resize", () => {
-        setHeight(window.innerHeight - 50);
+        setHeight(window.innerHeight - 100);
       });
     };
   }, []);

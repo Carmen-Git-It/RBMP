@@ -8,12 +8,18 @@ import {
   Typography,
 } from "@mui/material";
 import { useAtom, useAtomValue } from "jotai";
-import React from "react";
+import React, { useEffect } from "react";
 import { fillerAtom, typesAtom } from "../../store/store";
 
 export default function FillerContentType() {
   const types = useAtomValue(typesAtom);
   const [currentType, setCurrentType] = useAtom(fillerAtom);
+
+  useEffect(() => {
+    if (!currentType) {
+      setCurrentType(types[1]);
+    }
+  }, [])
 
   function handleChangeType(e: SelectChangeEvent) {
     setCurrentType(
@@ -23,7 +29,7 @@ export default function FillerContentType() {
 
   return (
     <React.Fragment>
-      {types.length > 0 && (
+      {currentType && types.length > 0 && (
         <Box>
           <Typography variant="h5">Filler Content Type</Typography>
           <FormControl fullWidth>

@@ -27,15 +27,15 @@ import PlaylistConfig from "../../lib/model/playlistConfig";
 import PlaylistConfigSlot from "../../lib/model/playlistConfigSlot";
 import FillerContentType from "./fillerContentType";
 
-// TODO: MaxHeight based on window height for better fullscreen
-
+// TODO: Fail gracefully when user lacks all basics
 export default function Config() {
   const types = useAtomValue(typesAtom);
-  const fillerType = useAtomValue(fillerAtom);
+  const fillerType = useAtom(fillerAtom);
   const [configs, setConfigs] = useAtom(playlistConfigAtom);
   const [currentConfigIndex, setCurrentConfigIndex] = useAtom(
     currentPlaylistConfigIdAtom,
   );
+  const [height, setHeight] = useState(0);
   const [currentConfig, setCurrentConfig] = useState(configs[currentConfigIndex]);
   const [currentSlots, setCurrentSlots] = useState(configs[currentConfigIndex].slots.slice());
   const [name, setName] = useState(configs[currentConfigIndex].name);
@@ -43,6 +43,22 @@ export default function Config() {
   const [description, setDescription] = useState(
     configs[currentConfigIndex].description,
   );
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      console.log("WINDOW HEIGHT: " + window.innerHeight);
+      setHeight(window.innerHeight - 150);
+      window.addEventListener("resize", () => {
+        setHeight(window.innerHeight - 150);
+      });
+    }
+
+    return () => {
+      window.removeEventListener("resize", () => {
+        setHeight(window.innerHeight - 150);
+      });
+    };
+  }, []);
 
   useEffect(() => {
     if (newConfig) {
@@ -117,10 +133,10 @@ export default function Config() {
         Config
       </Typography>
       <Grid container spacing={2} sx={{ paddingBottom: 1 }}>
-        <Grid item md={6}>
+        <Grid item md={6} sx={{height: height}}>
           <Paper
             elevation={3}
-            sx={{ padding: 2, maxHeight: 550, overflow: "auto" }}
+            sx={{ padding: 2, overflow: "auto", maxHeight: "100%"}}
           >
             <Stack spacing={2}>
               <Stack spacing={1} direction="row">
@@ -202,8 +218,8 @@ export default function Config() {
             </Stack>
           </Paper>
         </Grid>
-        <Grid item md={6}>
-          <Stack>
+        <Grid item md={6} sx={{height: height}}>
+          <Stack sx={{maxHeight: "100%", overflow: "auto"}}>
             <FillerContentType />
             <FilesConfig />
           </Stack>

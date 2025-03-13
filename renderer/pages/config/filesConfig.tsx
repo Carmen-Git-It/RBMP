@@ -37,7 +37,7 @@ export default function FilesConfig() {
         </Button>
         <Stack spacing={2}>
           <Typography variant="h5">Files</Typography>
-          <Paper elevation={2} sx={{ maxHeight: 400, overflow: "auto" }}>
+          <Paper elevation={2} sx={{}}>
             <List sx={{ width: "100%" }}>
               {files.map((value, key) => (
                 <ListItem key={(key + 10) * 75}>
