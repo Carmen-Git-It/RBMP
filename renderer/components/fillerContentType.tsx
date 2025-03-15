@@ -22,6 +22,8 @@ export default function FillerContentType() {
   }, []);
 
   function handleChangeType(e: SelectChangeEvent) {
+    console.log(e.target.value);
+    console.log(types[1].id);
     setCurrentType(
       types.filter((t) => t.id.localeCompare(e.target.value) === 0)[0],
     );

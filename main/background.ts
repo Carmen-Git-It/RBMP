@@ -168,10 +168,3 @@ ipcMain.on("message", async (event, arg) => {
 ipcMain.on("write_file", async (event, arg) => {
   writeToFile(arg.fileName, arg.data);
 });
-
-// ipcMain.on("askToRead", (event, filePath) => {
-
-// 	fs.readFile(filePath, (error, data) => {
-// 		win.webContents.send("sendReadContent", data);
-// 	})
-// })

@@ -231,13 +231,7 @@ export default function HomePage() {
 
       // Load files
       loadFiles().then((f) => {
-        if (f.length === 0) {
-          // if (setupResults == null || setupResults == undefined) {
-          //   setupResults = setup();
-          // }
-          // const files = setupResults.files;
-          // writeData("files.conf", files);
-        } else {
+        if (f.length > 0) {
           setFiles(f);
         }
       });
@@ -261,7 +255,13 @@ export default function HomePage() {
         if (data) {
           setCurrentConfig(data.currentConfigIndex);
           const t = new VideoType().deserialize(data.fillerType);
+          console.log(t);
           setFillerType(t);
+        } else {
+          if (setupResults == null || setupResults == undefined) {
+            setupResults = setup();
+          }
+          setFillerType(setupResults.types[1]);
         }
       });
       setRunOnce(true);
