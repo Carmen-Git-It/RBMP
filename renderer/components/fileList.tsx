@@ -15,6 +15,7 @@ import writeData from "../lib/writeData";
 export default function FileList({ files }) {
   const [allFiles, setAllFiles] = useAtom(filesAtom);
 
+  // TODO: v this.
   function handleFileClick(id: String) {
     // Open edit file modal
     return id;
