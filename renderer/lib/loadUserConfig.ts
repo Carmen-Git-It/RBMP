@@ -1,10 +1,8 @@
-import Playlist from "./model/playlist";
-
-export default async function loadPlaylist() {
+export default async function loadUserConfig() {
   if (Object.hasOwn(window, "electronAPI")) {
     const w: any = window;
     const data = await w.electronAPI.openFile("openFile", {
-      fileName: "playlist.conf",
+      fileName: "config.conf",
     });
 
     if (data == null) {
@@ -12,9 +10,7 @@ export default async function loadPlaylist() {
     }
     const jsonData = JSON.parse(data.toString());
 
-    const playlist = new Playlist().deserialize(jsonData);
-
-    console.log("Current playlist loaded.");
-    return playlist;
+    console.log("User configs loaded.");
+    return jsonData;
   }
 }

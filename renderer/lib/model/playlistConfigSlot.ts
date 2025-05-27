@@ -12,6 +12,7 @@ export default class PlaylistConfigSlot
   type: VideoType;
   volume: number;
   muted: boolean;
+  featured: boolean;
 
   generateUUID() {
     this.id = uuidv4();
@@ -24,6 +25,7 @@ export default class PlaylistConfigSlot
     this.type = new VideoType().deserialize(input.type);
     this.volume = input.volume;
     this.muted = input.muted;
+    this.featured = input.featured;
 
     return this;
   }

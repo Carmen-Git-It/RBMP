@@ -16,48 +16,54 @@ import { useAtom, useAtomValue } from "jotai";
 import React, { useEffect, useState } from "react";
 import {
   currentPlaylistConfigIdAtom,
+  fillerAtom,
   playlistConfigAtom,
   typesAtom,
 } from "../../store/store";
 import writeData from "../../lib/writeData";
-import FilesConfig from "./filesConfig";
-import Slots from "./slots";
-import VideoType from "../../lib/model/videoType";
-import { Dayjs } from "dayjs";
+import FilesConfig from "../../components/filesConfig";
+import Slots from "../../components/slots";
 import PlaylistConfig from "../../lib/model/playlistConfig";
 import PlaylistConfigSlot from "../../lib/model/playlistConfigSlot";
+import FillerContentType from "../../components/fillerContentType";
 
+// TODO: Fail gracefully when user lacks all basics
 export default function Config() {
   const types = useAtomValue(typesAtom);
+  const fillerType = useAtom(fillerAtom);
   const [configs, setConfigs] = useAtom(playlistConfigAtom);
   const [currentConfigIndex, setCurrentConfigIndex] = useAtom(
     currentPlaylistConfigIdAtom,
   );
+  const [height, setHeight] = useState(0);
   const [currentConfig, setCurrentConfig] = useState(
     configs[currentConfigIndex],
   );
-  const [startTimes, setStartTimes] = useState(new Array<Dayjs>());
-  const [endTimes, setEndTimes] = useState(new Array<Dayjs>());
-  const [slotTypes, setSlotTypes] = useState(new Array<VideoType>(100));
-  const [name, setName] = useState(configs[currentConfigIndex].name);
+  const [currentSlots, setCurrentSlots] = useState(
+    configs.length > 0 ? configs[currentConfigIndex].slots.slice() : [],
+  );
+  const [name, setName] = useState(
+    configs.length > 0 ? configs[currentConfigIndex].name : "",
+  );
   const [newConfig, setNewConfig] = useState(false);
   const [description, setDescription] = useState(
-    configs[currentConfigIndex].description,
+    configs.length > 0 ? configs[currentConfigIndex].description : "",
   );
 
   useEffect(() => {
-    if (startTimes.length === 0) {
-      const tempArr = new Array<Dayjs>(
-        configs[currentConfigIndex].slots.length,
-      );
-      setStartTimes(tempArr);
+    if (typeof window !== "undefined") {
+      console.log("WINDOW HEIGHT: " + window.innerHeight);
+      setHeight(window.innerHeight - 150);
+      window.addEventListener("resize", () => {
+        setHeight(window.innerHeight - 150);
+      });
     }
-    if (endTimes.length === 0) {
-      const tempArr = new Array<Dayjs>(
-        configs[currentConfigIndex].slots.length,
-      );
-      setEndTimes(tempArr);
-    }
+
+    return () => {
+      window.removeEventListener("resize", () => {
+        setHeight(window.innerHeight - 150);
+      });
+    };
   }, []);
 
   useEffect(() => {
@@ -72,20 +78,13 @@ export default function Config() {
   }, [configs]);
 
   useEffect(() => {
-    if (currentConfig) {
-      setSlotTimeArrLength();
-      setSlotTypes(new Array<VideoType>(100));
+    if (currentConfigIndex && fillerType) {
+      writeData("config.conf", {
+        currentConfigIndex: currentConfigIndex,
+        fillerType: fillerType,
+      });
     }
-  }, [currentConfig]);
-
-  function setSlotTimeArrLength() {
-    const tempStarts = new Array<Dayjs>(
-      configs[currentConfigIndex].slots.length,
-    );
-    setStartTimes(tempStarts);
-    const tempEnds = new Array<Dayjs>(configs[currentConfigIndex].slots.length);
-    setEndTimes(tempEnds);
-  }
+  }, [currentConfigIndex, fillerType]);
 
   function handleChangeCurrentConfig(e: SelectChangeEvent) {
     const index = Number.parseInt(e.target.value);
@@ -95,31 +94,14 @@ export default function Config() {
     setDescription(configs[index].description);
 
     setCurrentConfig(configs[index]);
-
-    setSlotTimeArrLength();
   }
 
   function handleSaveConfig() {
     const tempConfigs = configs.slice();
-    for (let i = 0; i < tempConfigs[currentConfigIndex].slots.length; i++) {
-      // Start time
-      if (startTimes[i] !== undefined) {
-        tempConfigs[currentConfigIndex].slots[i].startTime =
-          startTimes[i].get("minutes") + startTimes[i].get("hours") * 60;
-      }
-      // End time
-      if (endTimes[i] !== undefined) {
-        tempConfigs[currentConfigIndex].slots[i].endTime =
-          endTimes[i].get("minutes") + endTimes[i].get("hours") * 60;
-      }
-      // Type
-      if (slotTypes[i] !== undefined) {
-        tempConfigs[currentConfigIndex].slots[i].type = slotTypes[i];
-      }
-    }
-
-    tempConfigs[currentConfigIndex].name = name;
-    tempConfigs[currentConfigIndex].description = description;
+    currentConfig.slots = currentSlots;
+    currentConfig.name = name;
+    currentConfig.description = description;
+    tempConfigs[currentConfigIndex] = currentConfig;
     setConfigs(tempConfigs);
     setCurrentConfig(tempConfigs[currentConfigIndex]);
     writeData("configs.conf", tempConfigs);
@@ -146,6 +128,7 @@ export default function Config() {
     tempSlot.muted = false;
     tempSlot.volume = 100;
     tempSlot.type = types[1];
+    tempSlot.featured = false;
     tempConfig.slots.push(tempSlot);
 
     const tempConfigs = configs.slice();
@@ -155,16 +138,20 @@ export default function Config() {
     setNewConfig(true);
   }
 
+  if (!configs || configs.length === 0) {
+    return <Typography variant="h1">Wait for stuff to load, yo.</Typography>;
+  }
+
   return (
     <React.Fragment>
       <Typography variant="h3" gutterBottom sx={{ paddingTop: 2 }}>
         Config
       </Typography>
       <Grid container spacing={2} sx={{ paddingBottom: 1 }}>
-        <Grid item md={6}>
+        <Grid item md={6} sx={{ height: height }}>
           <Paper
             elevation={3}
-            sx={{ padding: 2, maxHeight: 550, overflow: "auto" }}
+            sx={{ padding: 2, overflow: "auto", maxHeight: "100%" }}
           >
             <Stack spacing={2}>
               <Stack spacing={1} direction="row">
@@ -228,13 +215,9 @@ export default function Config() {
                   />
                   <Paper elevation={6}>
                     <Slots
-                      startTimes={startTimes}
-                      setStartTimes={setStartTimes}
-                      endTimes={endTimes}
-                      setEndTimes={setEndTimes}
-                      slotTypes={slotTypes}
-                      setSlotTypes={setSlotTypes}
                       currentConfig={currentConfig}
+                      currentSlots={currentSlots}
+                      setCurrentSlots={setCurrentSlots}
                     />
                   </Paper>
                   <Button
@@ -250,8 +233,11 @@ export default function Config() {
             </Stack>
           </Paper>
         </Grid>
-        <Grid item md={6}>
-          <FilesConfig></FilesConfig>
+        <Grid item md={6} sx={{ height: height }}>
+          <Stack sx={{ maxHeight: "100%", overflow: "auto" }}>
+            <FillerContentType />
+            <FilesConfig />
+          </Stack>
         </Grid>
       </Grid>
     </React.Fragment>

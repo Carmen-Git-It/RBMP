@@ -72,7 +72,7 @@ const selectMediaDir = async (window) => {
     ],
     properties: ["openDirectory", "multiSelections"],
   });
-  // TODO: Get duration
+
   if (!canceled) {
     const files = {};
     for (const filePath of filePaths) {
@@ -83,8 +83,12 @@ const selectMediaDir = async (window) => {
         validMediaTypes.includes(path.extname(p)),
       );
       for (const p of files[filePath]) {
-        const d = await getVideoDurationInSeconds(filePath + "/" + p);
-        arr.push({ filePath: p, duration: d });
+        try {
+          const d = await getVideoDurationInSeconds(filePath + "/" + p);
+          arr.push({ filePath: p, duration: d });
+        } catch (e) {
+          console.log("File error: " + e);
+        }
       }
 
       files[filePath] = arr;
@@ -108,6 +112,7 @@ const selectMediaFile = async (window) => {
   if (!canceled) {
     const file = {};
     file["filePath"] = filePaths[0];
+    console.log(filePaths[0]);
     const d = await getVideoDurationInSeconds(filePaths[0]);
     file["duration"] = d;
 
@@ -163,10 +168,3 @@ ipcMain.on("message", async (event, arg) => {
 ipcMain.on("write_file", async (event, arg) => {
   writeToFile(arg.fileName, arg.data);
 });
-
-// ipcMain.on("askToRead", (event, filePath) => {
-
-// 	fs.readFile(filePath, (error, data) => {
-// 		win.webContents.send("sendReadContent", data);
-// 	})
-// })
